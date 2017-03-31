@@ -1,26 +1,28 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"preproccess/modules/mconfig"
-	"preproccess/modules/mlog"
+	"preprocess/modules/mconfig"
+	"preprocess/modules/mlog"
+	"strings"
+
+	"preprocess/modules/pushkafka"
 
 	"github.com/howeyc/fsnotify"
 )
 
-var Watcher *fsnotify.Watcher
-
-func init() {
-	Watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		mlog.Error(err)
-	}
+func main() {
+	dpiDir, err := mconfig.Conf.String("dir", "DpiDir")
+	RunNotify(dpiDir, DpiHandle)
 }
 
-func main() {
+func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 	go func() {
-		err := Watcher.Watch("testDir")
+		err := Watcher.Watch(dir)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -30,7 +32,7 @@ func main() {
 		select {
 		case ev := <-Watcher.Event:
 			if ev.IsCreate() {
-				mlog.Debug(fmt.Println("Create file:", ev.Name))
+				go handle(ev)
 			}
 		case err := <-Watcher.Error:
 			mlog.Error(err)
@@ -38,5 +40,71 @@ func main() {
 	}
 
 	/* ... do stuff ... */
-	watcher.Close()
+	Watcher.Close()
+}
+
+func ReadFile(FileName string) ([]byte, error) {
+	fileContent, err := ioutil.ReadFile(FileName)
+	if err != nil {
+		return nil, err
+	}
+	return fileContent, nil
+}
+
+func CheckSuffix(FileName string) bool {
+	f := func(c rune) bool {
+		return c == '.'
+	}
+	ss := strings.FieldsFunc(FileName, f)
+	suffix := ss[len(ss)-1]
+	if suffix != "xdr" && suffix != "XDR" {
+		return false
+	}
+	return true
+}
+
+func DpiHandle(ev *fsnotify.FileEvent) error {
+	mlog.Debug(fmt.Println("Create file:", ev.Name))
+	//check file suffix
+	if ok := CheckSuffix(ev.Name); !ok {
+		panic(fmt.Sprintf("file: %s suffix error!", ev.Name))
+	}
+	//read file
+	content, err := ReadFile(ev.Name)
+	if err != nil {
+		panic(fmt.Sprintf("read file %s error:%s", ev.Name, err.Error()))
+	}
+	//XDR==>struct
+	datalist, err := ParseXdr(content)
+	if err != nil {
+		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
+	}
+	//push to kafka
+	for _, datap := range datalist {
+		go DoPushTopic(datap)
+	}
+	return nil
+}
+
+func DoPushTopic(datap *DpiXDR) error {
+	//struct==>json
+	jsonstr, _ := json.Marshal(*datap)
+	//json==>topic
+	dtype := datap.CheckType()
+
+	mm, ok := TopicMap[dtype]
+	if !ok {
+		mlog.Error("TopicMap %d not exist", dtype)
+		return errors.New(fmt.Sprintf("topicMap[%s] not exist", dtype))
+	}
+	topic := &TopicType{
+		topicName: mm.topicName,
+		handlePre: mm.handlePre,
+		origiData: jsonstr,
+		partition: int(datap.HashPartation()),
+	}
+	if err := pushkafka.PushKafka(topic); err != nil {
+		return err
+	}
+	return nil
 }
