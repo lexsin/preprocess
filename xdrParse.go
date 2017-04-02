@@ -7,7 +7,7 @@ import (
 	"preprocess/modules/mlog"
 )
 
-func parseElements(data []byte) (*DpiXDR, error) {
+func parseElements(data []byte) (*DpiXdr, error) {
 
 }
 
@@ -15,13 +15,43 @@ func GetTlvId(data []byte) int32 {
 	baseSize := binary.Size(head.baseInfo)
 }
 
-func ParseXdr(origiData []byte) ([]*DpiXDR, error) {
-	list, _ := ParseXdrHead(origiData)
-	results := make([]*DpiXDR, 0)
-	for _, data := range list {
-		xdr := parseElements(data)
+func parseEachXdr(xdr *TlvValue, obj *DpiXdr) error {
+	switch xdr.TlvId {
+	case 0:
+		mlog.Debug("find xdr id=0")
+	case XDR_SESSION_STATUS:
+		if err := ParsSessionStatus(xdr, obj); err != nil {
+			return err
+		}
+	case XDR_APP_ID:
+		if err := parsAppId(); err != nil {
+			return err
+		}
+
 	}
-	results = append(results, xdr)
+}
+
+func rangeParseXdr(xdrs []TlvValue) *DpiXdr {
+	var xdrOjbect DpiXdr
+	for _, xdr := range xdrs {
+		parseEachXdr(&xdr, &DpiXdr)
+	}
+}
+
+func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
+	/*
+		list, _ := ParseXdrHead(origiData)
+		results := make([]*DpiXdr, 0)
+		for _, data := range list {
+			xdr := parseElements(data)
+		}
+		results = append(results, xdr)
+	*/
+	tlvValues := RangeToObj(origiData)
+	for _, tlv := range tlvValues {
+		xdrs := RangeToObj(tlv)
+		obj := rangeParseXdr(xdrs)
+	}
 	return results, nil
 }
 
@@ -31,7 +61,7 @@ type TlvFormExtend struct {
 		ShortData  uint8
 		TypeIdhigh uint8
 		Reserve    uint8
-		TlvLength  uint32
+		DataLen    uint32
 	}
 	TlvData []byte
 }
@@ -41,7 +71,7 @@ type TlvForm struct {
 		ShortData  uint8
 		TypeIdHigh uint8
 		Reserve    uint8
-		TlvLength  uint32
+		DataLen    uint32
 	}
 	TlvData []byte
 }
@@ -54,7 +84,7 @@ type TlvValue struct {
 	Data      []byte
 }
 
-func TransToObj(data []byte) []TlvValue {
+func RangeToObj(data []byte) []TlvValue {
 	var list []TlvValue
 	buf := new(bytes.Buffer)
 	totallen := len(data)
@@ -70,11 +100,11 @@ func TransToObj(data []byte) []TlvValue {
 				TlvId:     headExt.baseInfo.TlvId,
 				ShortData: headExt.baseInfo.ShortData,
 				IsExtend:  true,
-				TlvLen:    headExt.baseInfo.TlvLength,
-				Data:      data[headsize : headsize+headExt.baseInfo.TlvLength],
+				DataLen:   headExt.baseInfo.TlvLength - headsize,
+				Data:      data[headsize:headExt.baseInfo.TlvLength],
 			}
 			list = append(list, value)
-			offset += 
+			offset += headExt.baseInfo.TlvLength
 		} else {
 			var head TlvFormExtend
 			buf.Reset()
@@ -85,10 +115,11 @@ func TransToObj(data []byte) []TlvValue {
 				TlvId:     head.baseInfo.TlvId,
 				ShortData: head.baseInfo.ShortData,
 				IsExtend:  false,
-				TlvLen:    head.baseInfo.TlvLength,
-				Data:      data[headsize : headsize+head.baseInfo.TlvLength],
+				TlvLen:    head.baseInfo.TlvLength - headsize,
+				Data:      data[headsize:head.baseInfo.TlvLength],
 			}
 			list = append(list, value)
+			offset += headExt.baseInfo.TlvLength
 		}
 	}
 }
@@ -159,12 +190,12 @@ const (
 	XdrFileType
 )
 
-func (this *DpiXDR) CheckType() int {
+func (this *DpiXdr) CheckType() int {
 	//TODO
 	return XdrType
 }
 
-func (this *DpiXDR) HashPartation() int32 {
+func (this *DpiXdr) HashPartation() int32 {
 	//init topic partition
 	var err error
 	AgentNum, err = mconfig.Conf.Int("kafka", "AgentNum")

@@ -86,7 +86,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	return nil
 }
 
-func DoPushTopic(datap *DpiXDR) error {
+func DoPushTopic(datap *DpiXdr) error {
 	//struct==>json
 	jsonstr, _ := json.Marshal(*datap)
 	//json==>topic

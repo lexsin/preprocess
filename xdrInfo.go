@@ -1,6 +1,6 @@
 package main
 
-type DpiXDR struct {
+type DpiXdr struct {
 	SessionStatus uint8
 	AppId         uint8
 	Tuple         FiveTupleInfo
@@ -23,12 +23,11 @@ type DpiXDR struct {
 	FtpInfo       FtpInfo  //unfold
 	MailInfo      MailInfo //unfold
 	DnsInfo       DnsInfo  //unfold
-	VpnType       uint8
-	//66-57
+	//55-57
 	//58-61
-	HttpReqInfo  string
-	HttpRespInfo string
-	FileContent  string
+	HttpReqInfo  []byte
+	HttpRespInfo []byte
+	FileContent  []byte
 }
 
 type HttpInfo struct {
@@ -50,9 +49,9 @@ type DnsInfo struct {
 	DnsRspCode        uint8
 	DnsRsqCnt         uint8
 	DnsRspRecordCnt   uint8
-	DNSAuthCnttCnt    uint8
-	DNSExtraRecordCnt uint8
-	DNSRspDelay       uint32
+	DnsAuthCnttCnt    uint8
+	DnsExtraRecordCnt uint8
+	DnsRspDelay       uint32
 }
 
 type FtpInfo struct {
