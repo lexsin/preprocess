@@ -65,11 +65,11 @@ func CheckSuffix(FileName string) bool {
 }
 
 func DpiHandle(ev *fsnotify.FileEvent) error {
-	defer func(){
+	defer func() {
 		if err := recover(); err != nil {
 			mlog.Error(err)
 		}
-	}
+	}()
 	mlog.Debug(fmt.Println("Create file:", ev.Name))
 	//check file suffix
 	if ok := CheckSuffix(ev.Name); !ok {

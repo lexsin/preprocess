@@ -1,5 +1,9 @@
 package xdrParse
 
+import (
+	"errors"
+)
+
 type DpiXdr struct {
 	SessionStatus uint8
 	AppId         uint8
@@ -173,4 +177,12 @@ type Ipv6_s struct {
 	a uint32
 	b uint32
 	c uint32
+}
+
+var ErrXdrHeadErr error
+var ErrXdrNotEnoughLenErr error
+
+func errInit() {
+	ErrXdrHeadErr = errors.New("head check error")
+	ErrXdrNotEnoughLenErr = errors.New("xdr data isn't enough long")
 }
