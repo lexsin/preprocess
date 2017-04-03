@@ -81,9 +81,12 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
 	}
 	//push to kafka
+
 	for _, datap := range datalist {
-		go DoPushTopic(datap)
+		mlog.Debug("data=", datap)
+		//go DoPushTopic(datap)
 	}
+
 	return nil
 }
 

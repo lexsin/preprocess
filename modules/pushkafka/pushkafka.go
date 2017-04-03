@@ -87,6 +87,7 @@ func moduleInit() {
 	//defer broker.Close()
 }
 
+/*
 func init() {
 	//init module first
 	moduleInit()
@@ -95,3 +96,4 @@ func init() {
 	CreateTopicWriter("xdrHttp")
 	CreateTopicWriter("xdrFile")
 }
+*/
