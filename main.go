@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	dpiDir, _ := mconfig.Conf.String("dir", "DpiDir")
+	dpiDir, _ := mconfig.Conf.String("dir", "WatchDir")
 	RunNotify(dpiDir, DpiHandle)
 }
 
