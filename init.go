@@ -41,3 +41,9 @@ func init() {
 		handlePre: XdrFilePreHandle,
 	}
 }
+
+const (
+	XdrType = iota
+	XdrHttpType
+	XdrFileType
+)

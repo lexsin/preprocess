@@ -8,6 +8,7 @@ import (
 	"log"
 	"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
+	"preprocess/modules/xdrParse"
 	"strings"
 
 	"preprocess/modules/pushkafka"
@@ -16,7 +17,7 @@ import (
 )
 
 func main() {
-	dpiDir, err := mconfig.Conf.String("dir", "DpiDir")
+	dpiDir, _ := mconfig.Conf.String("dir", "DpiDir")
 	RunNotify(dpiDir, DpiHandle)
 }
 
@@ -75,7 +76,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 		panic(fmt.Sprintf("read file %s error:%s", ev.Name, err.Error()))
 	}
 	//XDR==>struct
-	datalist, err := ParseXdr(content)
+	datalist, err := xdrParse.ParseXdr(content)
 	if err != nil {
 		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
 	}
@@ -86,7 +87,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	return nil
 }
 
-func DoPushTopic(datap *DpiXdr) error {
+func DoPushTopic(datap *xdrParse.DpiXdr) error {
 	//struct==>json
 	jsonstr, _ := json.Marshal(*datap)
 	//json==>topic

@@ -1,59 +1,12 @@
-package main
+package xdrParse
 
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
 )
-
-func parseElements(data []byte) (*DpiXdr, error) {
-
-}
-
-func GetTlvId(data []byte) int32 {
-	baseSize := binary.Size(head.baseInfo)
-}
-
-func parseEachXdr(xdr *TlvValue, obj *DpiXdr) error {
-	switch xdr.TlvId {
-	case 0:
-		mlog.Debug("find xdr id=0")
-	case XDR_SESSION_STATUS:
-		if err := ParsSessionStatus(xdr, obj); err != nil {
-			return err
-		}
-	case XDR_APP_ID:
-		if err := parsAppId(); err != nil {
-			return err
-		}
-
-	}
-}
-
-func rangeParseXdr(xdrs []TlvValue) *DpiXdr {
-	var xdrOjbect DpiXdr
-	for _, xdr := range xdrs {
-		parseEachXdr(&xdr, &DpiXdr)
-	}
-}
-
-func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
-	/*
-		list, _ := ParseXdrHead(origiData)
-		results := make([]*DpiXdr, 0)
-		for _, data := range list {
-			xdr := parseElements(data)
-		}
-		results = append(results, xdr)
-	*/
-	tlvValues := RangeToObj(origiData)
-	for _, tlv := range tlvValues {
-		xdrs := RangeToObj(tlv)
-		obj := rangeParseXdr(xdrs)
-	}
-	return results, nil
-}
 
 type TlvFormExtend struct {
 	baseInfo struct {
@@ -61,17 +14,18 @@ type TlvFormExtend struct {
 		ShortData  uint8
 		TypeIdhigh uint8
 		Reserve    uint8
-		DataLen    uint32
+		TlvLength  uint32
 	}
 	TlvData []byte
 }
+
 type TlvForm struct {
 	baseInfo struct {
 		TlvId      uint8
 		ShortData  uint8
 		TypeIdHigh uint8
 		Reserve    uint8
-		DataLen    uint32
+		TlvLength  uint32
 	}
 	TlvData []byte
 }
@@ -80,14 +34,44 @@ type TlvValue struct {
 	TlvId     uint8
 	ShortData uint8
 	IsExtend  bool
-	TlvLen    uint32
+	DataLen   uint32
 	Data      []byte
+}
+
+const (
+	XdrType = iota
+	XdrHttpType
+	XdrFileType
+)
+
+func parseOneXdr(xdr *TlvValue, obj *DpiXdr) error {
+	return DecodeFuncMap[int(xdr.TlvId)](xdr, obj)
+}
+
+func rangeParseXdr(xdrs []TlvValue) *DpiXdr {
+	var xdrOjbect DpiXdr
+	for _, xdr := range xdrs {
+		if err := parseOneXdr(&xdr, &xdrOjbect); err != nil {
+			mlog.Error(fmt.Sprintf("parse xdr %s error:%s", xdr.TlvId, err.Error()))
+		}
+	}
+	return &xdrOjbect
+}
+
+func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
+	var results []*DpiXdr
+	tlvValues := RangeToObj(origiData)
+	for _, tlv := range tlvValues {
+		xdrs := RangeToObj(tlv.Data)
+		obj := rangeParseXdr(xdrs)
+		results = append(results, obj)
+	}
+	return results, nil
 }
 
 func RangeToObj(data []byte) []TlvValue {
 	var list []TlvValue
 	buf := new(bytes.Buffer)
-	totallen := len(data)
 	offset := 0
 	for {
 		if IsExtend(data) {
@@ -100,11 +84,11 @@ func RangeToObj(data []byte) []TlvValue {
 				TlvId:     headExt.baseInfo.TlvId,
 				ShortData: headExt.baseInfo.ShortData,
 				IsExtend:  true,
-				DataLen:   headExt.baseInfo.TlvLength - headsize,
+				DataLen:   uint32(headExt.baseInfo.TlvLength - uint32(headsize)),
 				Data:      data[headsize:headExt.baseInfo.TlvLength],
 			}
 			list = append(list, value)
-			offset += headExt.baseInfo.TlvLength
+			offset += int(headExt.baseInfo.TlvLength)
 		} else {
 			var head TlvFormExtend
 			buf.Reset()
@@ -115,15 +99,16 @@ func RangeToObj(data []byte) []TlvValue {
 				TlvId:     head.baseInfo.TlvId,
 				ShortData: head.baseInfo.ShortData,
 				IsExtend:  false,
-				TlvLen:    head.baseInfo.TlvLength - headsize,
+				DataLen:   uint32(head.baseInfo.TlvLength - uint32(headsize)),
 				Data:      data[headsize:head.baseInfo.TlvLength],
 			}
 			list = append(list, value)
-			offset += headExt.baseInfo.TlvLength
+			offset += int(head.baseInfo.TlvLength)
 		}
 	}
 }
 
+/*
 func GetIdAndData(data []byte) (int, []byte) {
 	buf := new(bytes.Buffer)
 	if IsExtend(data) {
@@ -138,9 +123,9 @@ func GetIdAndData(data []byte) (int, []byte) {
 		binary.Read(buf, binary.LittleEndian, &head.baseInfo)
 	}
 }
+*/
 
 func IsExtend(data []byte) bool {
-	headSize := 0
 	buf := new(bytes.Buffer)
 	buf.Write(data[:4])
 	var n int32
@@ -158,13 +143,13 @@ func GetTlvLength(data []byte) (result int) {
 		buf.Reset()
 		buf.Write(data[:binary.Size(head.baseInfo)])
 		binary.Read(buf, binary.LittleEndian, &head.baseInfo)
-		result = head.baseInfo.TlvLength
+		result = int(head.baseInfo.TlvLength)
 	} else {
 		var headExt TlvFormExtend
 		buf.Reset()
 		buf.Write(data[:binary.Size(headExt.baseInfo)])
 		binary.Read(buf, binary.LittleEndian, &headExt.baseInfo)
-		result = headExt.baseInfo.TlvLength
+		result = int(headExt.baseInfo.TlvLength)
 	}
 	return
 }
@@ -184,12 +169,6 @@ func ParseXdrHead(data []byte) ([][]byte, error) {
 	return list, nil
 }
 
-const (
-	XdrType = iota
-	XdrHttpType
-	XdrFileType
-)
-
 func (this *DpiXdr) CheckType() int {
 	//TODO
 	return XdrType
@@ -198,7 +177,7 @@ func (this *DpiXdr) CheckType() int {
 func (this *DpiXdr) HashPartation() int32 {
 	//init topic partition
 	var err error
-	AgentNum, err = mconfig.Conf.Int("kafka", "AgentNum")
+	_, err = mconfig.Conf.Int("kafka", "AgentNum")
 	if err != nil {
 		mlog.Error("app.conf AgentNum error")
 		panic("app.conf AgentNum error")

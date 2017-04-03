@@ -1,9 +1,10 @@
-package main
+package xdrParse
 
 import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"fmt"
 )
 
 const (
@@ -116,7 +117,7 @@ func parsSessionTime(xdr *TlvValue, obj *DpiXdr) error {
 	return nil
 }
 
-func pars_BussiStat(xdr *TlvValue, obj *DpiXdr) error {
+func parsBussiStat(xdr *TlvValue, obj *DpiXdr) error {
 	if err := normalDataDecode(xdr.Data, &obj.SesionStat); err != nil {
 		return errors.New(fmt.Sprintf("XDR_BUSSI_STAT error:%s", err.Error()))
 	}
@@ -433,7 +434,7 @@ func parsDnsRspRecordCnt(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsDNSAuthCnttCnt(xdr *TlvValue, obj *DpiXdr) error {
 	//52
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DNSAuthCnttCnt); err != nil {
+	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsAuthCnttCnt); err != nil {
 		return errors.New(fmt.Sprintf("XDR_DNS_AUTH_CNTT_CNT error:%s", err.Error()))
 	}
 	return nil
@@ -449,7 +450,7 @@ func parsDnsExtraRecordCnt(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsDnsRspDelay(xdr *TlvValue, obj *DpiXdr) error {
 	//54
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DNSRspDelay); err != nil {
+	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRspDelay); err != nil {
 		return errors.New(fmt.Sprintf("XDR_DNS_RSP_DELAY error:%s", err.Error()))
 	}
 	return nil

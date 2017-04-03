@@ -1,4 +1,4 @@
-package main
+package xdrParse
 
 type DpiXdr struct {
 	SessionStatus uint8
