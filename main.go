@@ -85,17 +85,21 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	if err != nil {
 		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
 	}
+	//trans to backend obj
+	backlist := TransToBackendObj(datalist)
+	//pre process file into ceph
+	//TODO
 	//push to kafka
 
-	for _, datap := range datalist {
+	for _, datap := range backlist {
 		mlog.Debug("data=", datap)
-		//go DoPushTopic(datap)
+		go DoPushTopic(datap)
 	}
 
 	return nil
 }
 
-func DoPushTopic(datap *xdrParse.DpiXdr) error {
+func DoPushTopic(datap *BackendObj) error {
 	//struct==>json
 	jsonstr, _ := json.Marshal(*datap)
 	//json==>topic

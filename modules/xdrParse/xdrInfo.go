@@ -34,17 +34,6 @@ type DpiXdr struct {
 	FileContent  []byte
 }
 
-type HttpInfo struct {
-	HttpHost       string
-	HttpUrl        string
-	HttpOnlineHost string
-	HttpUserAgent  string
-	HttpContent    string
-	HttpRefer      string
-	HttpCookie     string
-	HttpLocation   string
-}
-
 type DnsInfo struct {
 	DnsZones          string
 	DnsIpNum          uint8
@@ -83,24 +72,33 @@ type MailInfo struct {
 }
 
 type RtspBase struct {
-	usCStartPort    uint16
-	usCEndPort      uint16
-	usSStartPort    uint16
-	usSEndPort      uint16
-	usSsnVideoCount uint16
-	usSsnAudioCount uint16
-	ulResDelay      uint32
+	UsCStartPort    uint16
+	UsCEndPort      uint16
+	UsSStartPort    uint16
+	UsSEndPort      uint16
+	UsSsnVideoCount uint16
+	UsSsnAudioCount uint16
+	UlResDelay      uint32
 }
 
 type SipInfo struct {
-	ucCallDirection uint8
-	ucCallType      uint8
-	ucHookReason    uint8
-	ucSignalType    uint8
-	usDataflowNum   uint16
-	ubSipIVMR       uint16 //ubSipInvite+ubSipBye+malloc+resv
+	UcCallDirection uint8
+	UcCallType      uint8
+	UcHookReason    uint8
+	UcSignalType    uint8
+	UsDataflowNum   uint16
+	UbSipIVMR       uint16 //ubSipInvite+ubSipBye+malloc+resv
 }
-
+type HttpInfo struct {
+	HttpHost       string
+	HttpUrl        string
+	HttpOnlineHost string
+	HttpUserAgent  string
+	HttpContent    string
+	HttpRefer      string
+	HttpCookie     string
+	HttpLocation   string
+}
 type HttpBaseInfo struct {
 	Ulactiontime        uint64
 	Ulfirst_packet_time uint64
@@ -110,9 +108,7 @@ type HttpBaseInfo struct {
 	UsHttpStatus        uint16
 	UcHttpMethod        uint8
 	Uchttpversion       uint8
-	UcFirstRequestFlag  uint16
-	UcSerHeadFlag       uint32 //serflag + headflag
-	Res                 uint16
+	UcUnionFlag         uint8 //ucFirstRequestFlag+ucSerFlag+ucHeadFlag+res
 	UcIE                uint8
 	UcPortal            uint8
 	Resv                uint8
@@ -142,9 +138,9 @@ type TcpInfo struct {
 }
 
 type SessionTime struct {
-	CreatTime uint8
-	StartTime uint8
-	EndTIme   uint8
+	CreatTime uint64
+	StartTime uint64
+	EndTIme   uint64
 }
 
 type StandStat struct {

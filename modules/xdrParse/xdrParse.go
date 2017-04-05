@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"preprocess/modules/mconfig"
+	//"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
 )
 
@@ -62,12 +62,12 @@ func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
 	var results []*DpiXdr
 	tlvValues, err := RangeToObj(origiData)
 	if err != nil {
-		mlog.Error("first flood RangeToObj err:" + err.Error())
+		mlog.Error("first floor RangeToObj err:" + err.Error())
 	}
 	for _, tlv := range tlvValues {
 		xdrs, err := RangeToObj(tlv.Data)
 		if err != nil {
-			mlog.Error("second flood RangeToObj err:" + err.Error())
+			mlog.Error("second floor RangeToObj err:" + err.Error())
 			return nil, err
 		}
 		mlog.Debug("xdrs=", xdrs)
@@ -95,11 +95,6 @@ func RangeToObj(data []byte) ([]TlvValue, error) {
 			break
 		}
 		temp = data[offset:]
-		/*
-			if ok := XdrHeadCheck(temp); !ok {
-				return list, ErrXdrHeadErr
-			}
-		*/
 		isExtend, err := IsExtend(temp)
 		if err != nil {
 			//not enough long
@@ -165,14 +160,20 @@ func GetIdAndData(data []byte) (int, []byte) {
 
 func IsExtend(data []byte) (bool, error) {
 	buf := new(bytes.Buffer)
+	if len(data) < 4 {
+		return false, ErrXdrNotEnoughLenErr
+	}
+	mlog.Debug("isextend data=", data[:4])
 	buf.Write(data[:4])
 	var n int32
 	if err := binary.Read(buf, binary.LittleEndian, &n); err != nil {
 		return false, err
 	}
 	if n&0x00008000 == 0 {
+		mlog.Debug("is not extend")
 		return false, nil
 	}
+	mlog.Debug("is extend")
 	return true, nil
 }
 
@@ -208,21 +209,4 @@ func ParseXdrHead(data []byte) ([][]byte, error) {
 		}
 	}
 	return list, nil
-}
-
-func (this *DpiXdr) CheckType() int {
-	//TODO
-	return XdrType
-}
-
-func (this *DpiXdr) HashPartation() int32 {
-	//init topic partition
-	var err error
-	_, err = mconfig.Conf.Int("kafka", "AgentNum")
-	if err != nil {
-		mlog.Error("app.conf AgentNum error")
-		panic("app.conf AgentNum error")
-	}
-	//TODO
-	return 0
 }
