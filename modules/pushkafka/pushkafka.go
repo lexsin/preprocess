@@ -75,7 +75,9 @@ func CreateTopicWriter(topicName string) error {
 	}()
 	//save write chan name
 	WriterMap[topicName] = ch
+
 	mlog.Info("create topic:", topicName, "channel=", ch)
+	mlog.Debug(fmt.Sprintf("WriterMap[%s]", topicName), "=", WriterMap[topicName])
 	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
 	return nil
 }
