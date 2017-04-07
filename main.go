@@ -126,5 +126,6 @@ func DoPushTopic(datap *BackendObj) error {
 	if err := pushkafka.PushKafka(topic); err != nil {
 		return err
 	}
+
 	return nil
 }

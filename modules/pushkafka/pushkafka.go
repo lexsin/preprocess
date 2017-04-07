@@ -36,6 +36,7 @@ func PushKafka(info PushKafkaer) error {
 		partition: info.Partition(),
 	}
 	writer <- datainfo
+	mlog.Debug("push topic(", topic, ") partation(", datainfo.partition, ")success!")
 	return nil
 }
 
