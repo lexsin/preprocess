@@ -113,6 +113,7 @@ func DoPushTopic(datap *BackendObj) error {
 	dtype := datap.CheckType()
 
 	mm, ok := TopicMap[dtype]
+	mlog.Debug("TopicMap[", dtype, "]=", TopicMap[dtype])
 	if !ok {
 		mlog.Error("TopicMap %d not exist", dtype)
 		return errors.New(fmt.Sprintf("topicMap[%s] not exist", dtype))

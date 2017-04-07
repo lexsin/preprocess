@@ -10,7 +10,7 @@ import (
 	"github.com/optiopay/kafka/proto"
 )
 
-var kafkaAddrs = []string{"localhost:9092", "localhost:9093"}
+var kafkaAddrs = []string{"10.80.6.9:9092", "10.80.6.9:9093"}
 var Broker *kafka.Broker
 var WriterMap map[string]chan dataInfo
 
@@ -22,13 +22,16 @@ type PushKafkaer interface {
 }
 
 func PushKafka(info PushKafkaer) error {
+	mlog.Debug("111")
 	topic := info.TopicName()
 	writer, ok := WriterMap[topic]
 	if !ok {
+		mlog.Error("topic not exist")
 		return errors.New("topic not exist")
 	}
 	data, err := info.PreProcessData(info.OriginalData())
 	if err != nil {
+		mlog.Error(fmt.Sprintf("PreProcessData error:%s", err.Error()))
 		return errors.New(fmt.Sprintf("PreProcessData error:%s", err.Error()))
 	}
 	datainfo := dataInfo{
@@ -88,7 +91,6 @@ func moduleInit() {
 	//defer broker.Close()
 }
 
-/*
 func init() {
 	//init module first
 	moduleInit()
@@ -97,4 +99,3 @@ func init() {
 	CreateTopicWriter("xdrHttp")
 	CreateTopicWriter("xdrFile")
 }
-*/
