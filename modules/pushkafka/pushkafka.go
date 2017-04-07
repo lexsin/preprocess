@@ -76,7 +76,7 @@ func CreateTopicWriter(topicName string) error {
 						topicName, data.partition, err.Error()))
 				}
 			case <-time.After(time.Second * 10):
-				mlog.Info("pushtopic module wait ", time.Second(waitTimeOut), " s...")
+				mlog.Info("pushtopic module wait ", time.Duration(waitTimeOut).Seconds(), " s...")
 			}
 		}
 	}()
