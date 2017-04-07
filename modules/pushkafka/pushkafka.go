@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
+	"time"
 
 	"github.com/optiopay/kafka"
 	"github.com/optiopay/kafka/proto"
@@ -13,6 +14,7 @@ import (
 var kafkaAddrs = []string{"10.80.6.9:9092", "10.80.6.9:9093"}
 var Broker *kafka.Broker
 var WriterMap map[string]chan dataInfo
+var waitTimeOut = 10 * time.Second
 
 type PushKafkaer interface {
 	TopicName() string
@@ -73,6 +75,8 @@ func CreateTopicWriter(topicName string) error {
 					mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s",
 						topicName, data.partition, err.Error()))
 				}
+			case <-time.After(time.Second * 10):
+				mlog.Info("pushtopic module wait ", time.Second(waitTimeOut), " s...")
 			}
 		}
 	}()
