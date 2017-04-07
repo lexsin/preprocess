@@ -21,13 +21,15 @@ type TlvFormExtend struct {
 
 type TlvForm struct {
 	baseInfo struct {
-		TlvId      uint8
-		ShortData  uint8
-		TypeIdHigh uint8
-		Reserve    uint8
-		TlvLength  uint32
+		TlvId         uint8
+		ShortData     uint8
+		TypeAndLength uint16
 	}
 	TlvData []byte
+}
+
+func (this *TlvForm) GetTlvLength() uint32 {
+	return uint32(this.baseInfo.TypeAndLength >> 4)
 }
 
 type TlvValue struct {
@@ -45,6 +47,7 @@ const (
 )
 
 func parseOneXdr(xdr *TlvValue, obj *DpiXdr) error {
+	mlog.Debug("parse xdr tlvid=", xdr.TlvId)
 	return DecodeFuncMap[int(xdr.TlvId)](xdr, obj)
 }
 
@@ -52,7 +55,7 @@ func rangeParseXdr(xdrs []TlvValue) *DpiXdr {
 	var xdrOjbect DpiXdr
 	for _, xdr := range xdrs {
 		if err := parseOneXdr(&xdr, &xdrOjbect); err != nil {
-			mlog.Error(fmt.Sprintf("parse xdr %s error:%s", xdr.TlvId, err.Error()))
+			mlog.Error(fmt.Sprintf("parse xdr %d error:%s", xdr.TlvId, err.Error()))
 		}
 	}
 	return &xdrOjbect
@@ -70,7 +73,7 @@ func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
 			mlog.Error("second floor RangeToObj err:" + err.Error())
 			return nil, err
 		}
-		mlog.Debug("xdrs=", xdrs)
+		//mlog.Debug("xdrs=", xdrs)
 		obj := rangeParseXdr(xdrs)
 		results = append(results, obj)
 	}
@@ -116,26 +119,29 @@ func RangeToObj(data []byte) ([]TlvValue, error) {
 				DataLen:   uint32(headExt.baseInfo.TlvLength - uint32(headsize)),
 				Data:      temp[headsize:headExt.baseInfo.TlvLength],
 			}
+			mlog.Debug("extend head TlvId=", headExt.baseInfo.TlvId, "TlvLength=", headExt.baseInfo.TlvLength)
 			list = append(list, value)
 			offset += int(headExt.baseInfo.TlvLength)
 		} else {
-			var head TlvFormExtend
+			var head TlvForm
 			buf.Reset()
 			headsize := binary.Size(head.baseInfo)
 			buf.Write(temp[:headsize])
 			binary.Read(buf, binary.LittleEndian, &head.baseInfo)
-			if len(temp) < int(head.baseInfo.TlvLength) {
+			tlvLength := (&head).GetTlvLength()
+			if len(temp) < int(tlvLength) {
 				return list, ErrXdrNotEnoughLenErr
 			}
 			value := TlvValue{
 				TlvId:     head.baseInfo.TlvId,
 				ShortData: head.baseInfo.ShortData,
 				IsExtend:  false,
-				DataLen:   uint32(head.baseInfo.TlvLength - uint32(headsize)),
-				Data:      temp[headsize:head.baseInfo.TlvLength],
+				DataLen:   uint32(tlvLength - uint32(headsize)),
+				Data:      temp[headsize:int(tlvLength)],
 			}
+			mlog.Debug("extend head TlvId=", head.baseInfo.TlvId, "TlvLength=", tlvLength)
 			list = append(list, value)
-			offset += int(head.baseInfo.TlvLength)
+			offset += int(tlvLength)
 		}
 	}
 	return list, nil
@@ -159,17 +165,23 @@ func GetIdAndData(data []byte) (int, []byte) {
 */
 
 func IsExtend(data []byte) (bool, error) {
+	type tempObj struct {
+		TlvId     uint8
+		ShortData uint8
+		Temp      uint16
+	}
 	buf := new(bytes.Buffer)
 	if len(data) < 4 {
 		return false, ErrXdrNotEnoughLenErr
 	}
 	mlog.Debug("isextend data=", data[:4])
 	buf.Write(data[:4])
-	var n int32
-	if err := binary.Read(buf, binary.LittleEndian, &n); err != nil {
+	var t = tempObj{}
+	if err := binary.Read(buf, binary.LittleEndian, &t); err != nil {
 		return false, err
 	}
-	if n&0x00008000 == 0 {
+	mlog.Debug("IsExtend() t.Temp=", fmt.Sprintf("0x%x", t.Temp))
+	if t.Temp&0x0001 == 0 {
 		mlog.Debug("is not extend")
 		return false, nil
 	}
@@ -185,7 +197,7 @@ func GetTlvLength(data []byte) (result int) {
 		buf.Reset()
 		buf.Write(data[:binary.Size(head.baseInfo)])
 		binary.Read(buf, binary.LittleEndian, &head.baseInfo)
-		result = int(head.baseInfo.TlvLength)
+		result = int((&head).GetTlvLength())
 	} else {
 		var headExt TlvFormExtend
 		buf.Reset()

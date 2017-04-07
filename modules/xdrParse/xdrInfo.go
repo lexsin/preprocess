@@ -13,7 +13,7 @@ type DpiXdr struct {
 	BussiStat     StandStat
 	TcpInfo       TcpInfo
 	ResponseDelay uint32
-	Level7Proto   uint64
+	Level7Proto   Level7Proto
 	HttpBaseInfo  HttpBaseInfo
 	HttpInfo      HttpInfo //unfold
 	Sip           SipInfo
@@ -170,9 +170,9 @@ type FiveTupleInfo struct {
 	DstIpv6v Ipv6_s
 }
 type Ipv6_s struct {
-	a uint32
-	b uint32
-	c uint32
+	A uint32
+	B uint32
+	C uint32
 }
 
 var ErrXdrHeadErr error

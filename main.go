@@ -71,28 +71,33 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 		}
 	}()
 	mlog.Debug(fmt.Println("Create file:", ev.Name))
+
 	//check file suffix
 	if ok := CheckSuffix(ev.Name); !ok {
 		panic(fmt.Sprintf("file: %s suffix error!", ev.Name))
 	}
+
 	//read file
 	content, err := ReadFile(ev.Name)
 	if err != nil {
 		panic(fmt.Sprintf("read file %s error:%s", ev.Name, err.Error()))
 	}
+
 	//XDR==>struct
 	datalist, err := xdrParse.ParseXdr(content)
 	if err != nil {
 		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
 	}
+
 	//trans to backend obj
 	backlist := TransToBackendObj(datalist)
+
 	//pre process file into ceph
 	//TODO
-	//push to kafka
 
+	//push to kafka
 	for _, datap := range backlist {
-		mlog.Debug("data=", datap)
+		//mlog.Debug("data=", datap)
 		go DoPushTopic(datap)
 	}
 
@@ -102,6 +107,8 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 func DoPushTopic(datap *BackendObj) error {
 	//struct==>json
 	jsonstr, _ := json.Marshal(*datap)
+	mlog.Debug("DoPushTopic json:", string(jsonstr))
+
 	//json==>topic
 	dtype := datap.CheckType()
 

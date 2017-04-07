@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	//"preprocess/modules/mlog"
 )
 
 const (
@@ -18,7 +19,7 @@ const (
 	XDR_TCP_INFO
 	XDR_RESPONSE_DELAY
 	XDR_LEVEL_7_PROTO
-	XDR_HTTP_BASE_INFO = 10
+	XDR_HTTP_BASE_INFO // 10
 	XDR_HTTP_HOST
 	XDR_HTTP_URL
 	XDR_HTTP_ONLINE_HOST
@@ -28,7 +29,7 @@ const (
 	XDR_HTTP_COOKIE
 	XDR_HTTP_LOCATION
 	XDR_SIP
-	XDR_SIP_CALLER = 20
+	XDR_SIP_CALLER // 20
 	XDR_SIP_CALLED
 	XDR_SIP_SESSION_ID
 	XDR_RTSP
@@ -39,7 +40,7 @@ const (
 	XDR_FTP_STATUS
 	XDR_FTP_USER_NAME
 	XDR_FTP_CUR_DIR
-	XDR_FTP_TRANS_MODE = 30
+	XDR_FTP_TRANS_MODE // 30
 	XDR_FTP_TRANS_TYPE
 	XDR_FTP_FILE_NAME
 	XDR_FTP_FILE_SIZE
@@ -50,7 +51,7 @@ const (
 	XDR_MAIL_RSP_STATUS
 	XDR_MAIL_USER_NAME
 	XDR_MAIL_RESV_INFO
-	XDR_MAIL_LENGTH = 40
+	XDR_MAIL_LENGTH // 40
 	XDR_MAIL_DOMAIN_INFO
 	XDR_MAIL_RESV_ACNT
 	XDR_MAIL_HDR
@@ -61,11 +62,11 @@ const (
 	XDR_DNS_IPV4
 	XDR_DNS_IPV6
 	XDR_DNS_RSP_CODE
-	XDR_DNS_RSQ_CNT = 50
+	XDR_DNS_RSQ_CNT // 50
 	XDR_DNS_RSP_RECODE_CNT
 	XDR_DNS_AUTH_CNTT_CNT
 	XDR_DNS_EXTRA_RECORD_CNT
-	XDR_DNS_RSP_DELAY  = 54
+	XDR_DNS_RSP_DELAY  // 54
 	XDR_HTTP_REQ_INFO  = 201
 	XDR_HTTP_RESP_INFO = 202
 	XDR_FILE_CONTENT   = 203
@@ -81,6 +82,7 @@ func normalDataDecode(data []byte, bin interface{}) error {
 	return nil
 }
 func ParsSessionStatus(xdr *TlvValue, obj *DpiXdr) error {
+	//1
 	if xdr.ShortData != 0 && xdr.ShortData != 1 {
 		return errors.New("XDR_SESSION_STATUS parse != 0/1")
 	}
@@ -89,6 +91,7 @@ func ParsSessionStatus(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsAppId(xdr *TlvValue, obj *DpiXdr) error {
+	//2
 	if xdr.ShortData < 100 && xdr.ShortData > 108 {
 		return errors.New("XDR_APP_ID out range")
 	}
@@ -97,6 +100,7 @@ func parsAppId(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsTuple(xdr *TlvValue, obj *DpiXdr) error {
+	//3
 	if err := normalDataDecode(xdr.Data, &obj.Tuple); err != nil {
 		return errors.New(fmt.Sprintf("XDR_TUPLE error:%s", err.Error()))
 	}
@@ -104,6 +108,7 @@ func parsTuple(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsSessionStat(xdr *TlvValue, obj *DpiXdr) error {
+	//4
 	if err := normalDataDecode(xdr.Data, &obj.SesionStat); err != nil {
 		return errors.New(fmt.Sprintf("XDR_TUPLE error:%s", err.Error()))
 	}
@@ -111,6 +116,7 @@ func parsSessionStat(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsSessionTime(xdr *TlvValue, obj *DpiXdr) error {
+	//5
 	if err := normalDataDecode(xdr.Data, &obj.SesionTime); err != nil {
 		return errors.New(fmt.Sprintf("XDR_SESSION_TIME error:%s", err.Error()))
 	}
@@ -118,6 +124,7 @@ func parsSessionTime(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsBussiStat(xdr *TlvValue, obj *DpiXdr) error {
+	//6
 	if err := normalDataDecode(xdr.Data, &obj.SesionStat); err != nil {
 		return errors.New(fmt.Sprintf("XDR_BUSSI_STAT error:%s", err.Error()))
 	}
@@ -125,6 +132,7 @@ func parsBussiStat(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsTcpInfo(xdr *TlvValue, obj *DpiXdr) error {
+	//7
 	if err := normalDataDecode(xdr.Data, &obj.TcpInfo); err != nil {
 		return errors.New(fmt.Sprintf("XDR_TCP_INFO error:%s", err.Error()))
 	}
@@ -132,6 +140,7 @@ func parsTcpInfo(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsResponseDelay(xdr *TlvValue, obj *DpiXdr) error {
+	//8
 	if err := normalDataDecode(xdr.Data, &obj.ResponseDelay); err != nil {
 		return errors.New(fmt.Sprintf("XDR_RESPONSE_DELAY error:%s", err.Error()))
 	}
@@ -156,6 +165,8 @@ func parsHttpBaseInfo(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsHttpHost(xdr *TlvValue, obj *DpiXdr) error {
 	//11
+	//mlog.Debug("xdr.data=", xdr.Data)
+	//mlog.Debug("string(xdr.Data)=", string(xdr.Data))
 	obj.HttpInfo.HttpHost = string(xdr.Data)
 	return nil
 }
@@ -457,19 +468,21 @@ func parsDnsRspDelay(xdr *TlvValue, obj *DpiXdr) error {
 }
 
 func parsHttpRespInfo(xdr *TlvValue, obj *DpiXdr) error {
-	//202
+	//201
+	//mlog.Debug("obj.HttpRespInfo=", string(xdr.Data))
 	obj.HttpRespInfo = xdr.Data
 	return nil
 }
 
 func parsHttpReqInfo(xdr *TlvValue, obj *DpiXdr) error {
-	//203
+	//202
+	//mlog.Debug("obj.HttpReqInfo=", string(xdr.Data))
 	obj.HttpReqInfo = xdr.Data
 	return nil
 }
 
 func parsFileContent(xdr *TlvValue, obj *DpiXdr) error {
-	//204
+	//203
 	obj.FileContent = xdr.Data
 	return nil
 }
