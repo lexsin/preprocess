@@ -24,8 +24,6 @@ type PushKafkaer interface {
 func PushKafka(info PushKafkaer) error {
 	topic := info.TopicName()
 	writer, ok := WriterMap[topic]
-	mlog.Debug(fmt.Sprintf("WriterMap[%s]", topic), "=", WriterMap[topic])
-	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
 	for k, v := range WriterMap {
 		mlog.Debug("k=", k, "v=", v)
 	}
@@ -65,6 +63,7 @@ func CreateTopicWriter(topicName string) error {
 	go func() {
 		select {
 		case data := <-ch:
+			mlog.Debug("get topic data:", string(data.data))
 			producer := Broker.Producer(kafka.NewProducerConf())
 			msg := &proto.Message{Value: data.data}
 			if _, err := producer.Produce(topicName, int32(data.partition), msg); err != nil {
@@ -77,8 +76,6 @@ func CreateTopicWriter(topicName string) error {
 	WriterMap[topicName] = ch
 
 	mlog.Info("create topic:", topicName, "channel=", ch)
-	mlog.Debug(fmt.Sprintf("WriterMap[%s]", topicName), "=", WriterMap[topicName])
-	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
 	return nil
 }
 
