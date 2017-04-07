@@ -22,11 +22,10 @@ type PushKafkaer interface {
 }
 
 func PushKafka(info PushKafkaer) error {
-	mlog.Debug("111")
 	topic := info.TopicName()
 	writer, ok := WriterMap[topic]
 	if !ok {
-		mlog.Error("topic not exist")
+		mlog.Error("topic:", topic, "not exist")
 		return errors.New("topic not exist")
 	}
 	data, err := info.PreProcessData(info.OriginalData())
@@ -71,6 +70,7 @@ func CreateTopicWriter(topicName string) error {
 	}()
 	//save write chan name
 	WriterMap[topicName] = ch
+	mlog.Debug("create topic:", topicName)
 	return nil
 }
 
