@@ -14,7 +14,7 @@ import (
 var kafkaAddrs = []string{"10.80.6.9:9092", "10.80.6.9:9093"}
 var Broker *kafka.Broker
 var WriterMap map[string]chan dataInfo
-var waitTimeOut = 10 * time.Second
+var waitTimeOut = 120 * time.Second
 
 type PushKafkaer interface {
 	TopicName() string
@@ -63,7 +63,6 @@ func CreateTopicWriter(topicName string) error {
 	}
 	ch := make(chan dataInfo, chansize)
 	go func() {
-		//timeout := make(chan bool, 1)
 		for {
 
 			select {
@@ -76,7 +75,7 @@ func CreateTopicWriter(topicName string) error {
 						topicName, data.partition, err.Error()))
 				}
 			case <-time.After(time.Second * 10):
-				mlog.Info("pushtopic module wait ", time.Duration(waitTimeOut).Seconds(), " s...")
+				mlog.Info("writer(", topicName, ") wait ", time.Duration(waitTimeOut).Seconds(), "s...")
 			}
 		}
 	}()
