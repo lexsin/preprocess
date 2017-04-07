@@ -26,6 +26,9 @@ func PushKafka(info PushKafkaer) error {
 	writer, ok := WriterMap[topic]
 	mlog.Debug("WriterMap[", topic, "]=", WriterMap[topic])
 	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
+	for k, v := range WriterMap {
+		mlog.Debug("k=", k, "v=", v)
+	}
 	if !ok {
 		mlog.Error("topic:", topic, "not exist")
 		return errors.New("topic not exist")
