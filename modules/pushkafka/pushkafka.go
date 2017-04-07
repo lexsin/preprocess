@@ -24,7 +24,7 @@ type PushKafkaer interface {
 func PushKafka(info PushKafkaer) error {
 	topic := info.TopicName()
 	writer, ok := WriterMap[topic]
-	mlog.Debug("WriterMap[", topic, "]=", WriterMap[topic])
+	mlog.Debug(fmt.Sprintf("WriterMap[%s]", topic), "=", WriterMap[topic])
 	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
 	for k, v := range WriterMap {
 		mlog.Debug("k=", k, "v=", v)
