@@ -14,7 +14,7 @@ import (
 var kafkaAddrs = []string{"10.80.6.9:9092", "10.80.6.9:9093"}
 var Broker *kafka.Broker
 var WriterMap map[string]chan dataInfo
-var waitTimeOut = 120 * time.Second
+var waitTimeOut = 600 * time.Second
 
 type PushKafkaer interface {
 	TopicName() string
@@ -82,7 +82,7 @@ func CreateTopicWriter(topicName string) error {
 	//save write chan name
 	WriterMap[topicName] = ch
 
-	mlog.Info("create topic:", topicName, "channel=", ch)
+	mlog.Info("create topic:", topicName)
 	return nil
 }
 
