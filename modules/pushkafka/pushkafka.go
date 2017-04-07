@@ -61,14 +61,18 @@ func CreateTopicWriter(topicName string) error {
 	}
 	ch := make(chan dataInfo, chansize)
 	go func() {
-		select {
-		case data := <-ch:
-			mlog.Debug("get topic data:", string(data.data))
-			producer := Broker.Producer(kafka.NewProducerConf())
-			msg := &proto.Message{Value: data.data}
-			if _, err := producer.Produce(topicName, int32(data.partition), msg); err != nil {
-				mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s",
-					topicName, data.partition, err.Error()))
+		//timeout := make(chan bool, 1)
+		for {
+
+			select {
+			case data := <-ch:
+				mlog.Debug("get topic data:", string(data.data))
+				producer := Broker.Producer(kafka.NewProducerConf())
+				msg := &proto.Message{Value: data.data}
+				if _, err := producer.Produce(topicName, int32(data.partition), msg); err != nil {
+					mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s",
+						topicName, data.partition, err.Error()))
+				}
 			}
 		}
 	}()
