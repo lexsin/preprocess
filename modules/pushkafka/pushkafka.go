@@ -25,6 +25,7 @@ func PushKafka(info PushKafkaer) error {
 	topic := info.TopicName()
 	writer, ok := WriterMap[topic]
 	mlog.Debug("WriterMap[", topic, "]=", WriterMap[topic])
+	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
 	if !ok {
 		mlog.Error("topic:", topic, "not exist")
 		return errors.New("topic not exist")
@@ -72,6 +73,7 @@ func CreateTopicWriter(topicName string) error {
 	//save write chan name
 	WriterMap[topicName] = ch
 	mlog.Info("create topic:", topicName, "channel=", ch)
+	mlog.Debug("WriterMap len", len(WriterMap), "p=", WriterMap)
 	return nil
 }
 
