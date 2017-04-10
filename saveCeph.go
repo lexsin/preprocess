@@ -52,9 +52,17 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 	wirteFile(httprespFile, httpResp)
 	wirteFile(httpreqFile, httpReq)
 
-	//modify obj
+	//modify object
 	data.HttpRespInfo = []byte(httprespFile)
 	data.HttpReqInfo = []byte(httpreqFile)
+
+	//del other unnormal big file
+	if len(data.FileContent) != 0 {
+		data.FileContent = nil
+		mlog.Error("len(FileContent)=", len(data.FileContent))
+		mlog.Error("HttpRespInfo HttpReqInfo FileContent both have data")
+	}
+
 	return nil
 }
 
@@ -117,4 +125,9 @@ func createPathByTime() string {
 	day := now.Day()
 	path := fmt.Sprintf("%d/%d/%d", year, month, day)
 	return path
+}
+
+func createFilenameByMd5(data []byte) string {
+	sum := Md5Sum(data)
+	return fmt.Sprintf("%x", sum)
 }
