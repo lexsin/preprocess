@@ -34,8 +34,8 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 	//write file
 	httpResp := data.HttpRespInfo
 	httpReq := data.HttpReqInfo
-	respFileName := Md5Sum(httpResp)
-	reqFileName := Md5Sum(httpReq)
+	respFileName := createFilenameByMd5(httpResp)
+	reqFileName := createFilenameByMd5(httpReq)
 	rootPath := "/cephfs/DPI/http"
 	path := createPathByTime()
 	fullPath := rootPath + "/" + string(path)
@@ -69,7 +69,7 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 func xdrFileTypeToCeph(data *xdrParse.DpiXdr) error {
 	//write file
 	content := data.FileContent
-	fileName := Md5Sum(content)
+	fileName := createFilenameByMd5(content)
 	rootPath := "/cephfs/DPI/file"
 	path := createPathByTime()
 	fullPath := rootPath + "/" + string(path)
