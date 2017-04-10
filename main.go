@@ -105,7 +105,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 func DoPushTopic(datap *BackendObj) error {
 	//struct==>json
 	jsonstr, _ := json.Marshal(*datap)
-	mlog.Debug("DoPushTopic json:", string(jsonstr))
+	//mlog.Debug("DoPushTopic json:", string(jsonstr))
 
 	//json==>topic
 	dtype := datap.CheckType()

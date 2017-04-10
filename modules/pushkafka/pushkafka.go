@@ -67,7 +67,7 @@ func CreateTopicWriter(topicName string) error {
 
 			select {
 			case data := <-ch:
-				mlog.Debug("get topic data:", string(data.data))
+				//mlog.Debug("get topic data:", string(data.data))
 				producer := Broker.Producer(kafka.NewProducerConf())
 				msg := &proto.Message{Value: data.data}
 				if _, err := producer.Produce(topicName, int32(data.partition), msg); err != nil {

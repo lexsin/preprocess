@@ -14,6 +14,7 @@ func saveToCeph(objlist []*xdrParse.DpiXdr) error {
 	mlog.Debug("111")
 	for _, obj := range objlist {
 		jtype := obj.CheckType()
+		mlog.Debug("jtype=", jtype)
 		switch jtype {
 		case xdrParse.XdrType:
 			//xdrTypeToCeph()
@@ -35,14 +36,16 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 	httpReq := data.HttpReqInfo
 	respFileName := Md5Sum(httpResp)
 	reqFileName := Md5Sum(httpReq)
-	rootPath := "DPI/http"
+	rootPath := "/cephfs/DPI/http"
 	path := createPathByTime()
 	fullPath := rootPath + "/" + string(path)
 	if exist, _ := IsExist(string(fullPath)); !exist {
 		//create dir
+		mlog.Debug(string(fullPath), " not exist")
 		if err := os.MkdirAll(fullPath, os.ModePerm); err != nil {
 			mlog.Error("MkdirAll dir:", fullPath, err.Error())
 		}
+		mlog.Debug(string(fullPath), " created!")
 	}
 	httprespFile := fullPath + "/" + string(respFileName)
 	httpreqFile := fullPath + "/" + string(reqFileName)
@@ -59,7 +62,7 @@ func xdrFileTypeToCeph(data *xdrParse.DpiXdr) error {
 	//write file
 	content := data.FileContent
 	fileName := Md5Sum(content)
-	rootPath := "DPI/file"
+	rootPath := "/cephfs/DPI/file"
 	path := createPathByTime()
 	fullPath := rootPath + "/" + string(path)
 	if exist, _ := IsExist(string(fullPath)); !exist {
