@@ -83,17 +83,15 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 		panic(fmt.Sprintf("read file %s error:%s", ev.Name, err.Error()))
 	}
 
-	//XDR==>struct
+	//XDR==>pre object
 	datalist, err := xdrParse.ParseXdr(content)
 	if err != nil {
 		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
 	}
-
-	//trans to backend obj
+	//file to ceph
+	saveToCeph(datalist)
+	//pre object ==> backend object
 	backlist := TransToBackendObj(datalist)
-
-	//pre process file into ceph
-	//TODO
 
 	//push to kafka
 	for _, datap := range backlist {

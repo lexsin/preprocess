@@ -74,8 +74,8 @@ func CreateTopicWriter(topicName string) error {
 					mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s",
 						topicName, data.partition, err.Error()))
 				}
-			case <-time.After(time.Second * 10):
-				mlog.Info("writer(", topicName, ") wait ", time.Duration(waitTimeOut).Seconds(), "s...")
+			case <-time.After(waitTimeOut):
+				mlog.Debug("writer(", topicName, ") wait ", time.Duration(waitTimeOut).Seconds(), "s...")
 			}
 		}
 	}()

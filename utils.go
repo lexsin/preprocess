@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/binary"
 	"net"
 )
@@ -19,4 +20,9 @@ func IntToBool(u uint32) bool {
 	} else {
 		return true
 	}
+}
+
+func Md5Sum(data []byte) []byte {
+	sum := md5.Sum(data)
+	return sum[:]
 }

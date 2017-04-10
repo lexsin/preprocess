@@ -147,23 +147,6 @@ func RangeToObj(data []byte) ([]TlvValue, error) {
 	return list, nil
 }
 
-/*
-func GetIdAndData(data []byte) (int, []byte) {
-	buf := new(bytes.Buffer)
-	if IsExtend(data) {
-		var headExt TlvFormExtend
-		buf.Reset()
-		buf.Write(data[:binary.Size(headExt.baseInfo)])
-		binary.Read(buf, binary.LittleEndian, &headExt.baseInfo)
-	} else {
-		var head TlvForm
-		buf.Reset()
-		buf.Write(data[:binary.Size(head.baseInfo)])
-		binary.Read(buf, binary.LittleEndian, &head.baseInfo)
-	}
-}
-*/
-
 func IsExtend(data []byte) (bool, error) {
 	type tempObj struct {
 		TlvId     uint8

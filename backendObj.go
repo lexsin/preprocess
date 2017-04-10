@@ -257,8 +257,8 @@ func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
 		obj.Http.Refer = src.HttpInfo.HttpRefer
 		obj.Http.Cookie = src.HttpInfo.HttpCookie
 		obj.Http.Location = src.HttpInfo.HttpLocation
-		//obj.Http.Request = src.HttpInfo
-		//obj.Http.Response =
+		obj.Http.Request = string(src.HttpReqInfo)
+		obj.Http.Response = string(src.HttpRespInfo)
 		obj.Http.RequestTime = src.HttpBaseInfo.Ulactiontime
 		obj.Http.FirstResponseTime = src.HttpBaseInfo.Ulfirst_packet_time
 		obj.Http.LastContentTime = src.HttpBaseInfo.UlLast_Packet_Time
@@ -330,7 +330,7 @@ func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
 		//obj.App.Status
 		//obj.App.ClassId
 		//obj.App.Proto
-		//obj.App.File
+		obj.App.File = string(src.FileContent)
 		list = append(list, obj)
 	}
 	return list
