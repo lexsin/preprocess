@@ -11,6 +11,7 @@ import (
 )
 
 func saveToCeph(objlist []*xdrParse.DpiXdr) error {
+	mlog.Debug("111")
 	for _, obj := range objlist {
 		jtype := obj.CheckType()
 		switch jtype {
@@ -21,9 +22,10 @@ func saveToCeph(objlist []*xdrParse.DpiXdr) error {
 		case xdrParse.XdrFileType:
 			xdrFileTypeToCeph(obj)
 		default:
-			mlog.Error("CheckType error! return ", jtype, ", object:", obj)
+			mlog.Error("CheckType error! return ", jtype)
 		}
 	}
+	mlog.Debug("save to ceph success!")
 	return nil
 }
 
