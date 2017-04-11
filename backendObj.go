@@ -1,8 +1,8 @@
 package main
 
 import (
-	"preprocess/modules/mconfig"
-	"preprocess/modules/mlog"
+	//"preprocess/modules/mconfig"
+	//"preprocess/modules/mlog"
 	"preprocess/modules/xdrParse"
 )
 
@@ -350,20 +350,23 @@ func (this *BackendObj) CheckType() int {
 }
 
 func (this *BackendObj) HashPartation() uint32 {
-	//init topic partition
-	partitionNum, err := mconfig.Conf.Int("kafka", "AgentNum")
-	if err != nil {
-		mlog.Error("app.conf AgentNum error")
-		panic("app.conf AgentNum error")
-	}
+	/*
+		//init topic partition
+		partitionNum, err := mconfig.Conf.Int("kafka", "AgentNum")
+		if err != nil {
+			mlog.Error("app.conf AgentNum error")
+			panic("app.conf AgentNum error")
+		}
 
-	sum := Ipv4StringToInt(this.Conn.Sip) +
-		Ipv4StringToInt(this.Conn.Dip) +
-		uint32(this.Conn.Dport) +
-		uint32(this.Conn.Sport) +
-		uint32(this.Conn.Proto)
-	if err != nil {
-		panic("[kafka]AgentNum not conf")
-	}
-	return uint32(uint32(sum) % uint32(partitionNum))
+			sum := Ipv4StringToInt(this.Conn.Sip) +
+				Ipv4StringToInt(this.Conn.Dip) +
+				uint32(this.Conn.Dport) +
+				uint32(this.Conn.Sport) +
+				uint32(this.Conn.Proto)
+			if err != nil {
+				panic("[kafka]AgentNum not conf")
+			}
+			return uint32(uint32(sum) % uint32(partitionNum))
+	*/
+	return 0
 }

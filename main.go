@@ -122,7 +122,6 @@ func DoPushTopic(datap *BackendObj) error {
 		origiData: jsonstr,
 		partition: int(datap.HashPartation()),
 	}
-	mlog.Debug("111 topicname=", mm.topicName)
 	if err := pushkafka.PushKafka(topic); err != nil {
 		return err
 	}
