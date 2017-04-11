@@ -55,7 +55,7 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 	data.HttpRespInfo = []byte(httprespFile)
 	data.HttpReqInfo = []byte(httpreqFile)
 
-	//del other unnormal big file
+	//del other unnormal big data
 	if len(data.FileContent) != 0 {
 		mlog.Warning("len(FileContent)=", len(data.FileContent))
 		mlog.Warning("HttpRespInfo HttpReqInfo FileContent both have data")
@@ -83,6 +83,18 @@ func xdrFileTypeToCeph(data *xdrParse.DpiXdr) error {
 
 	//modify obj
 	data.FileContent = []byte(fullFile)
+
+	//del other big data
+	if len(data.HttpReqInfo) != 0 {
+		mlog.Warning("len(HttpReqInfo)=", len(data.HttpReqInfo))
+		mlog.Warning("HttpRespInfo HttpReqInfo FileContent both have data")
+		data.HttpReqInfo = nil
+	}
+	if len(data.HttpRespInfo) != 0 {
+		mlog.Warning("len(HttpRespInfo)=", len(data.HttpRespInfo))
+		mlog.Warning("HttpRespInfo HttpReqInfo FileContent both have data")
+		data.HttpRespInfo = nil
+	}
 	return nil
 }
 
