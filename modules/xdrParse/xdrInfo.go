@@ -177,10 +177,10 @@ type Ipv6_s struct {
 }
 
 func (this *DpiXdr) CheckType() int {
-	if len(this.HttpReqInfo) != 0 {
-		return XdrHttpType
-	} else if len(this.HttpRespInfo) != 0 {
+	if len(this.FileContent) != 0 {
 		return XdrFileType
+	} else if len(this.HttpReqInfo) != 0 {
+		return XdrHttpType
 	} else {
 		return XdrType
 	}

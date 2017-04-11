@@ -338,7 +338,15 @@ func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
 
 func (this *BackendObj) CheckType() int {
 	//TODO
-	return XdrType
+
+	if len(this.App.File) != 0 {
+		return XdrFileType
+	} else if len(this.Http.Request) != 0 {
+		return XdrHttpType
+	} else {
+		return XdrType
+	}
+	return -1
 }
 
 func (this *BackendObj) HashPartation() uint32 {

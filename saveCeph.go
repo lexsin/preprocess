@@ -11,7 +11,6 @@ import (
 )
 
 func saveToCeph(objlist []*xdrParse.DpiXdr) error {
-	mlog.Debug("111")
 	for _, obj := range objlist {
 		jtype := obj.CheckType()
 		mlog.Debug("jtype=", jtype)
@@ -58,9 +57,9 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 
 	//del other unnormal big file
 	if len(data.FileContent) != 0 {
+		mlog.Warning("len(FileContent)=", len(data.FileContent))
+		mlog.Warning("HttpRespInfo HttpReqInfo FileContent both have data")
 		data.FileContent = nil
-		mlog.Error("len(FileContent)=", len(data.FileContent))
-		mlog.Error("HttpRespInfo HttpReqInfo FileContent both have data")
 	}
 
 	return nil
