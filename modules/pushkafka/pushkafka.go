@@ -64,7 +64,6 @@ func CreateTopicWriter(topicName string) error {
 	ch := make(chan dataInfo, chansize)
 	go func() {
 		for {
-
 			select {
 			case data := <-ch:
 				//mlog.Debug("get topic data:", string(data.data))

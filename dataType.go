@@ -33,10 +33,10 @@ func XdrPreHandle(data []byte) ([]byte, error) {
 
 func XdrHttpPreHandle(data []byte) ([]byte, error) {
 	//TODO
-	return nil, nil
+	return data, nil
 }
 
 func XdrFilePreHandle(data []byte) ([]byte, error) {
 	//TODO
-	return nil, nil
+	return data, nil
 }
