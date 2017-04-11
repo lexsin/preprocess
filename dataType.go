@@ -3,11 +3,11 @@ package main
 //"preprocess/modules/xdrParse"
 
 type DataType struct {
-	topicName        string
-	partition        int
-	origiData        []byte
-	handlePre        func(data []byte) ([]byte, error)
-	partitionHandler func(data *BackendObj) int
+	topicName string
+	partition int
+	origiData []byte
+	handlePre func(data []byte) ([]byte, error)
+	//partitionHandler func(data *BackendObj) int
 }
 
 func (this *DataType) TopicName() string {

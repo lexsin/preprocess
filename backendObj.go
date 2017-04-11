@@ -6,6 +6,11 @@ import (
 	"preprocess/modules/xdrParse"
 )
 
+type BackendInfo struct {
+	Type int
+	Data *BackendObj
+}
+
 type BackendObj struct {
 	Vendor string `json:Verdor`
 	Id     uint64 `json:id`
@@ -172,11 +177,11 @@ type BackendObj struct {
 		File      string `json:File`
 	} `json:App`
 	Alert struct {
-	} `json:Alert`
+	}
 }
 
-func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
-	list := []*BackendObj{}
+func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendInfo {
+	list := []*BackendInfo{}
 	for _, src := range origiList {
 		obj := &BackendObj{}
 		//obj.Vendor =
@@ -188,11 +193,11 @@ func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
 		}
 		obj.Class = src.AppId
 		if len(src.HttpReqInfo) != 0 {
-			obj.Type = 2
+			obj.Type = XdrHttpType
 		} else if len(src.FileContent) != 0 {
-			obj.Type = 1
+			obj.Type = XdrFileType
 		} else {
-			obj.Type = 0
+			obj.Type = XdrType
 		}
 		//obj.Time = src.Tuple
 		obj.Conn.Proto = src.Tuple.L4Proto
@@ -331,11 +336,16 @@ func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
 		//obj.App.ClassId
 		//obj.App.Proto
 		obj.App.File = string(src.FileContent)
-		list = append(list, obj)
+		info := &BackendInfo{
+			Type: src.CheckType(),
+			Data: obj,
+		}
+		list = append(list, info)
 	}
 	return list
 }
 
+/*
 func (this *BackendObj) CheckType() int {
 	//TODO
 
@@ -348,7 +358,7 @@ func (this *BackendObj) CheckType() int {
 	}
 	return -1
 }
-
+*/
 func (this *BackendObj) HashPartation() uint32 {
 	/*
 		//init topic partition

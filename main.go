@@ -94,33 +94,31 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	backlist := TransToBackendObj(datalist)
 
 	//push to kafka
-	for _, datap := range backlist {
+	for _, backObj := range backlist {
 		//mlog.Debug("data=", datap)
-		go DoPushTopic(datap)
+		go DoPushTopic(backObj)
 	}
 
 	return nil
 }
 
-func DoPushTopic(datap *BackendObj) error {
+func DoPushTopic(backObj *BackendInfo) error {
 	//struct==>json
-	jsonstr, _ := json.Marshal(*datap)
+	jsonstr, _ := json.Marshal(backObj.Data)
 	//mlog.Debug("DoPushTopic json:", string(jsonstr))
 
 	//json==>topic
-	dtype := datap.CheckType()
-
-	mm, ok := TopicMap[dtype]
-	mlog.Debug("TopicMap[", dtype, "]=", TopicMap[dtype])
+	mm, ok := TopicMap[backObj.Type]
+	mlog.Debug("TopicMap[", backObj.Type, "]=", TopicMap[backObj.Type])
 	if !ok {
-		mlog.Error("TopicMap %d not exist", dtype)
-		return errors.New(fmt.Sprintf("topicMap[%s] not exist", dtype))
+		mlog.Error("TopicMap %d not exist", backObj.Type)
+		return errors.New(fmt.Sprintf("topicMap[%s] not exist", backObj.Type))
 	}
 	topic := &DataType{
 		topicName: mm.topicName,
 		handlePre: mm.handlePre,
 		origiData: jsonstr,
-		partition: int(datap.HashPartation()),
+		partition: int(backObj.Data.HashPartation()),
 	}
 	if err := pushkafka.PushKafka(topic); err != nil {
 		return err
