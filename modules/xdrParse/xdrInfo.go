@@ -5,18 +5,6 @@ import (
 	//"preprocess/modules/mlog"
 )
 
-func (this *DpiXdr) CheckType() int {
-	if len(this.HttpReqInfo) != 0 {
-		return XdrHttpType
-	} else if len(this.HttpRespInfo) != 0 {
-		return XdrFileType
-	} else {
-		return XdrType
-	}
-
-	return -1
-}
-
 type DpiXdr struct {
 	SessionStatus uint8
 	AppId         uint8
@@ -186,6 +174,18 @@ type Ipv6_s struct {
 	A uint32
 	B uint32
 	C uint32
+}
+
+func (this *DpiXdr) CheckType() int {
+	if len(this.HttpReqInfo) != 0 {
+		return XdrHttpType
+	} else if len(this.HttpRespInfo) != 0 {
+		return XdrFileType
+	} else {
+		return XdrType
+	}
+
+	return -1
 }
 
 var ErrXdrHeadErr error

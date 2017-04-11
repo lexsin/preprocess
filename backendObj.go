@@ -198,8 +198,8 @@ func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendObj {
 		obj.Conn.Proto = src.Tuple.L4Proto
 		obj.Conn.Sport = src.Tuple.SrcPort
 		obj.Conn.Dport = src.Tuple.DstPort
-		obj.Conn.Sip = IntToIpv4(src.Tuple.SrcIpv4)
-		obj.Conn.Dip = IntToIpv4(src.Tuple.DstIpv4)
+		obj.Conn.Sip = Ipv4IntToString(src.Tuple.SrcIpv4)
+		obj.Conn.Dip = Ipv4IntToString(src.Tuple.DstIpv4)
 		//obj.ConnEx.Over =
 		//obj.ConnEx.Dir
 		obj.ConnSt.FlowUp = uint64(src.SesionStat.UpFlow)
@@ -341,14 +341,21 @@ func (this *BackendObj) CheckType() int {
 	return XdrType
 }
 
-func (this *BackendObj) HashPartation() int32 {
+func (this *BackendObj) HashPartation() uint32 {
 	//init topic partition
-	var err error
-	_, err = mconfig.Conf.Int("kafka", "AgentNum")
+	partitionNum, err := mconfig.Conf.Int("kafka", "AgentNum")
 	if err != nil {
 		mlog.Error("app.conf AgentNum error")
 		panic("app.conf AgentNum error")
 	}
-	//TODO
-	return 0
+
+	sum := Ipv4StringToInt(this.Conn.Sip) +
+		Ipv4StringToInt(this.Conn.Dip) +
+		uint32(this.Conn.Dport) +
+		uint32(this.Conn.Sport) +
+		uint32(this.Conn.Proto)
+	if err != nil {
+		panic("[kafka]AgentNum not conf")
+	}
+	return uint32(uint32(sum) % uint32(partitionNum))
 }

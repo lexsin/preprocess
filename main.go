@@ -116,7 +116,7 @@ func DoPushTopic(datap *BackendObj) error {
 		mlog.Error("TopicMap %d not exist", dtype)
 		return errors.New(fmt.Sprintf("topicMap[%s] not exist", dtype))
 	}
-	topic := &TopicType{
+	topic := &DataType{
 		topicName: mm.topicName,
 		handlePre: mm.handlePre,
 		origiData: jsonstr,

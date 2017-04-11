@@ -8,11 +8,20 @@ import (
 	"preprocess/modules/mlog"
 )
 
-func IntToIpv4(n uint32) string {
+func Ipv4IntToString(n uint32) string {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, n)
 	b := buf.Bytes()
-	return net.IPv4(b[3], b[2], b[1], b[0]).String()
+	return net.IPv4(b[0], b[1], b[2], b[3]).String()
+}
+
+func Ipv4StringToInt(ip string) uint32 {
+	bs := net.ParseIP(ip).To4()
+	var n uint32
+	buf := new(bytes.Buffer)
+	buf.Write(bs)
+	binary.Read(buf, binary.LittleEndian, &n)
+	return n
 }
 
 func IntToBool(u uint32) bool {

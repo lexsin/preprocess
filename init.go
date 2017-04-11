@@ -8,7 +8,7 @@ import (
 	"github.com/howeyc/fsnotify"
 )
 
-var TopicMap map[int]TopicType
+var TopicMap map[int]DataType
 var Watcher *fsnotify.Watcher
 var AgentNum int
 
@@ -22,21 +22,21 @@ func init() {
 	}
 
 	//init topic object
-	TopicMap = make(map[int]TopicType, 0)
+	TopicMap = make(map[int]DataType, 0)
 
 	XdrTopic, _ := mconfig.Conf.String("kafka", "XdrTopicName")
 	HttpTopic, _ := mconfig.Conf.String("kafka", "HttpTopicName")
 	FileTopic, _ := mconfig.Conf.String("kafka", "FileTopicName")
 
-	TopicMap[XdrType] = TopicType{
+	TopicMap[XdrType] = DataType{
 		topicName: XdrTopic,
 		handlePre: XdrPreHandle,
 	}
-	TopicMap[XdrHttpType] = TopicType{
+	TopicMap[XdrHttpType] = DataType{
 		topicName: HttpTopic,
 		handlePre: XdrHttpPreHandle,
 	}
-	TopicMap[XdrFileType] = TopicType{
+	TopicMap[XdrFileType] = DataType{
 		topicName: FileTopic,
 		handlePre: XdrFilePreHandle,
 	}
