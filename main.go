@@ -8,10 +8,17 @@ import (
 )
 
 func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
+	//var Watcher *fsnotify.Watcher
+	Watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		mlog.Error(err)
+		panic("fsnotify.NewWatcher() error:" + err.Error())
+	}
+
 	go func() {
 		err := Watcher.Watch(dir)
 		if err != nil {
-			mlog.Critical(err)
+			mlog.Error(err)
 		}
 	}()
 
