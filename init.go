@@ -1,25 +1,28 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"preprocess/modules/mconfig"
-	"preprocess/modules/mlog"
+	//"preprocess/modules/mlog"
 
-	"github.com/howeyc/fsnotify"
+	//"github.com/howeyc/fsnotify"
 )
 
 var TopicMap map[int]DataType
-var Watcher *fsnotify.Watcher
+
+//var Watcher *fsnotify.Watcher
 var AgentNum int
 
 func init() {
-	//init fsnotify
-	var err error
-	Watcher, err = fsnotify.NewWatcher()
-	if err != nil {
-		mlog.Error(err)
-		panic(fmt.Sprintf("fsnotify.NewWatcher() error:%s", err))
-	}
+	/*
+		//init fsnotify
+		var err error
+		Watcher, err = fsnotify.NewWatcher()
+		if err != nil {
+			mlog.Error(err)
+			panic(fmt.Sprintf("fsnotify.NewWatcher() error:%s", err))
+		}
+	*/
 
 	//init topic object
 	TopicMap = make(map[int]DataType, 0)

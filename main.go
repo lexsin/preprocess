@@ -8,7 +8,6 @@ import (
 )
 
 func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
-	//var Watcher *fsnotify.Watcher
 	Watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		mlog.Error(err)
@@ -38,7 +37,7 @@ func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 }
 
 func main() {
-	dpiDir, _ := mconfig.Conf.String("dir", "DpiDir")
+	dpiDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	go RunNotify(dpiDir, DpiHandle)
 
 	vdsAlertDir, _ := mconfig.Conf.String("dir", "vdsAlertDir")
