@@ -37,6 +37,8 @@ func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 }
 
 func main() {
+	var block chan int
+
 	dpiDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	go RunNotify(dpiDir, DpiHandle)
 
@@ -45,7 +47,7 @@ func main() {
 
 	idsAlertDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")
 	go RunNotify(idsAlertDir, IdsAlertHandler)
+
 	//block
-	for {
-	}
+	<-block
 }
