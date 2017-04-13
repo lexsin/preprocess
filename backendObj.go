@@ -1,8 +1,8 @@
 package main
 
 import (
-	//"preprocess/modules/mconfig"
-	//"preprocess/modules/mlog"
+	"preprocess/modules/mconfig"
+	"preprocess/modules/mlog"
 	"preprocess/modules/xdrParse"
 )
 
