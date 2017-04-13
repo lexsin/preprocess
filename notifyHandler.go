@@ -26,38 +26,6 @@ func VdsAlertHandler(ev *fsnotify.FileEvent) error {
 	return AlertHandler(ev.Name, topicname)
 }
 
-func AlertHandler(fileName string, topicName string) error {
-	defer func() {
-		if err := recover(); err != nil {
-			mlog.Error(err)
-		}
-	}()
-	mlog.Debug(fmt.Println("Create file:", fileName))
-
-	//check file suffix
-	if ok := CheckSuffix(fileName, "alert"); !ok {
-		panic(fmt.Sprintf("file: %s suffix error!", fileName))
-	}
-
-	//push kafka
-
-	pushkafkaFunc := func(line string) error {
-		data := &DataType{
-			topicName: topicName,
-			//handlePre: mm.handlePre,
-			origiData: []byte(line),
-			partition: 0,
-		}
-		if err := pushkafka.PushKafka(data); err != nil {
-			return err
-		}
-		return nil
-	}
-	//read file
-	DealFilePerline(fileName, pushkafkaFunc)
-	return nil
-}
-
 func DpiHandle(ev *fsnotify.FileEvent) error {
 	defer func() {
 		if err := recover(); err != nil {
@@ -93,6 +61,38 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 		go DoPushTopic(backObj)
 	}
 
+	return nil
+}
+
+func AlertHandler(fileName string, topicName string) error {
+	defer func() {
+		if err := recover(); err != nil {
+			mlog.Error(err)
+		}
+	}()
+	mlog.Debug(fmt.Println("Create file:", fileName))
+
+	//check file suffix
+	if ok := CheckSuffix(fileName, "alert"); !ok {
+		panic(fmt.Sprintf("file: %s suffix error!", fileName))
+	}
+
+	//push kafka
+
+	pushkafkaFunc := func(line string) error {
+		data := &DataType{
+			topicName: topicName,
+			//handlePre: mm.handlePre,
+			origiData: []byte(line),
+			partition: 0,
+		}
+		if err := pushkafka.PushKafka(data); err != nil {
+			return err
+		}
+		return nil
+	}
+	//read file
+	DealFilePerline(fileName, pushkafkaFunc)
 	return nil
 }
 
