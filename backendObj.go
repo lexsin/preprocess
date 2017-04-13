@@ -180,7 +180,7 @@ type BackendObj struct {
 		File      string `json:File`
 	} `json:App`
 	Alert struct {
-	} `json:-`
+	} `json:"-"`
 }
 
 func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendInfo {
