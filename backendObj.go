@@ -11,6 +11,9 @@ type BackendInfo struct {
 	Data *BackendObj
 }
 
+/*
+ * object array slice 不能为空
+ */
 type BackendObj struct {
 	Vendor string `json:Verdor`
 	Id     uint64 `json:id`
@@ -177,7 +180,7 @@ type BackendObj struct {
 		File      string `json:File`
 	} `json:App`
 	Alert struct {
-	}
+	} `json:-`
 }
 
 func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendInfo {
