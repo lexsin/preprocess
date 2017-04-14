@@ -67,15 +67,18 @@ func DealFilePerline(fileName string, handler func(string) error) (int, error) {
 	buf := bufio.NewReader(f)
 	for {
 		line, err := buf.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				return n, nil
+			}
+			return n, err
+		}
 		line = strings.TrimSpace(line)
 		if err := handler(line); err != nil {
 			mlog.Error("line:", line, "handler error:", err.Error())
 		}
 		n++
 		if err != nil {
-			if err == io.EOF {
-				return n, nil
-			}
 			return n, err
 		}
 	}
