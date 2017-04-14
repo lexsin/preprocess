@@ -23,7 +23,7 @@ func route() {
 	routerA.POST("/alert/waf", wafAlertWatch)
 }
 
-func wafAlertServer() {
+func RunWafServer() {
 	mlog.Debug("WAF-ALERT server start running...")
 	port, _ := mconfig.Conf.String("server", "HttpPort")
 	addr := ":" + port
@@ -55,7 +55,7 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	//response
 	mlog.Debug("waf alert push kafka success!")
-	Write(w, ErrOkErr, 0)
+	Write(w, ErrOkErr, 10000)
 }
 
 var ErrOkErr = errors.New("success")
