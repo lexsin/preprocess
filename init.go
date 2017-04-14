@@ -10,7 +10,6 @@ import (
 
 var TopicMap map[int]DataType
 
-//var Watcher *fsnotify.Watcher
 var AgentNum int
 
 func init() {

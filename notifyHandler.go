@@ -5,11 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	//"log"
 	"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
 	"preprocess/modules/xdrParse"
-	"strings"
 
 	"preprocess/modules/pushkafka"
 
@@ -102,26 +100,6 @@ func ReadFile(FileName string) ([]byte, error) {
 		return nil, err
 	}
 	return fileContent, nil
-}
-
-func CheckSuffix(FileName string, suffixs ...string) bool {
-	f := func(c rune) bool {
-		return c == '.'
-	}
-	ss := strings.FieldsFunc(FileName, f)
-	suffix := ss[len(ss)-1]
-	for _, stand := range suffixs {
-		if suffix == stand {
-			return true
-		}
-	}
-	return false
-	/*
-		if suffix != "xdr" && suffix != "XDR" {
-			return false
-		}
-		return true
-	*/
 }
 
 func DoPushTopic(backObj *BackendInfo) error {

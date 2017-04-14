@@ -20,7 +20,7 @@ func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 			mlog.Error(err)
 		}
 	}()
-
+	mlog.Info("begin watch dir:", dir)
 	for {
 		select {
 		case ev := <-Watcher.Event:

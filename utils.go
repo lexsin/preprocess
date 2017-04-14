@@ -8,10 +8,26 @@ import (
 	"io"
 	"net"
 	"os"
+	"path"
 	"preprocess/modules/mlog"
 	"strings"
 )
 
+func CheckSuffix(FileName string, suffixs ...string) bool {
+	suffix := path.Ext(FileName)
+	for _, stand := range suffixs {
+		if suffix == stand {
+			return true
+		}
+	}
+	return false
+	/*
+		if suffix != "xdr" && suffix != "XDR" {
+			return false
+		}
+		return true
+	*/
+}
 func Ipv4IntToString(n uint32) string {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, n)
