@@ -42,7 +42,7 @@ func main() {
 	dpiDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	go RunNotify(dpiDir, DpiHandle)
 
-	vdsAlertDir, _ := mconfig.Conf.String("dir", "VsAlertDir")
+	vdsAlertDir, _ := mconfig.Conf.String("dir", "VdsAlertDir")
 	go RunNotify(vdsAlertDir, VdsAlertHandler)
 
 	idsAlertDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")

@@ -36,6 +36,7 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	r.ParseForm()
 	content, _ := ioutil.ReadAll(r.Body)
 	r.Body.Close()
+	mlog.Debug("get waf alert:", string(content))
 
 	//check form
 	//TODO parse json
@@ -54,16 +55,15 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	//response
 	mlog.Debug("waf alert push kafka success!")
-	Write(w, ErrOkErr, 0, "")
+	Write(w, ErrOkErr, 0)
 }
 
 var ErrOkErr = errors.New("success")
 
-func Write(w http.ResponseWriter, err error, code int, data interface{}) {
+func Write(w http.ResponseWriter, err error, code int) {
 	rsp := RespData{
 		Code:    int32(code),
 		Message: err.Error(),
-		Data:    data,
 	}
 	writeContent, _ := json.Marshal(rsp)
 	mlog.Debug(string(writeContent))
@@ -71,7 +71,6 @@ func Write(w http.ResponseWriter, err error, code int, data interface{}) {
 }
 
 type RespData struct {
-	Code    int32       `json:"code"`
-	Message string      `json:"msg"`
-	Data    interface{} `json:"data"`
+	Code    int32  `json:"code"`
+	Message string `json:"msg"`
 }
