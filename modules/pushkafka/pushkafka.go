@@ -111,4 +111,8 @@ func init() {
 	CreateTopicWriter("xdr")
 	CreateTopicWriter("xdrHttp")
 	CreateTopicWriter("xdrFile")
+
+	CreateTopicWriter("waf-alert")
+	CreateTopicWriter("ids-alert")
+	CreateTopicWriter("vds-alert")
 }
