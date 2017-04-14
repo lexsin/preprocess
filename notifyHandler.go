@@ -16,12 +16,12 @@ import (
 
 func IdsAlertHandler(ev *fsnotify.FileEvent) error {
 	topicname, _ := mconfig.Conf.String("kafka", "IdsAlertTopicName")
-	return AlertHandler(ev.Name, topicname)
+	return AlertHandler(ev.Name, topicname, "xdr")
 }
 
 func VdsAlertHandler(ev *fsnotify.FileEvent) error {
 	topicname, _ := mconfig.Conf.String("kafka", "VdsAlertTopicName")
-	return AlertHandler(ev.Name, topicname)
+	return AlertHandler(ev.Name, topicname, "alert")
 }
 
 func DpiHandle(ev *fsnotify.FileEvent) error {
@@ -62,7 +62,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	return nil
 }
 
-func AlertHandler(fileName string, topicName string) error {
+func AlertHandler(fileName string, topicName string, suffix string) error {
 	defer func() {
 		if err := recover(); err != nil {
 			mlog.Error(err)
@@ -71,7 +71,7 @@ func AlertHandler(fileName string, topicName string) error {
 	mlog.Debug(fmt.Println("Create file:", fileName))
 
 	//check file suffix
-	if ok := CheckSuffix(fileName, "alert"); !ok {
+	if ok := CheckSuffix(fileName, suffix); !ok {
 		panic(fmt.Sprintf("file: %s suffix error!", fileName))
 	}
 
