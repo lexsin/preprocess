@@ -80,7 +80,9 @@ func AlertHandler(fileName string, topicName string, suffix string) error {
 	pushkafkaFunc := func(line string) error {
 		data := &DataType{
 			topicName: topicName,
-			//handlePre: mm.handlePre,
+			handlePre: func(data []byte) ([]byte, error) {
+				return data, nil
+			},
 			origiData: []byte(line),
 			partition: 0,
 		}
