@@ -16,7 +16,7 @@ import (
 func CheckSuffix(FileName string, suffixs ...string) bool {
 	suffix := path.Ext(FileName)
 	for _, stand := range suffixs {
-		if suffix == stand {
+		if suffix == "."+stand {
 			return true
 		}
 	}
