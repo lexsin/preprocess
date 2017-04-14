@@ -48,6 +48,9 @@ func main() {
 	idsAlertDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")
 	go RunNotify(idsAlertDir, IdsAlertHandler)
 
+	//begin waf-alert http server
+	wafAlertServer()
+
 	//block
 	<-block
 }

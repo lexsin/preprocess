@@ -3,9 +3,10 @@ package main
 import (
 	//"fmt"
 	"preprocess/modules/mconfig"
-	//"preprocess/modules/mlog"
+	"preprocess/modules/mlog"
 
-	//"github.com/howeyc/fsnotify"
+	//"github.com/julienschmidt/httprouter"
+	//"preprocess/modules/mlog"
 )
 
 var TopicMap map[int]DataType
@@ -13,17 +14,19 @@ var TopicMap map[int]DataType
 var AgentNum int
 
 func init() {
-	/*
-		//init fsnotify
-		var err error
-		Watcher, err = fsnotify.NewWatcher()
-		if err != nil {
-			mlog.Error(err)
-			panic(fmt.Sprintf("fsnotify.NewWatcher() error:%s", err))
-		}
-	*/
+	//init log
+	mlog.SetLogger("file", `{"filename":"logs/server.log"}`)
+	mlog.SetLogger("console", "")
+	mlog.SetLogLevel(mlog.LevelDebug)
 
 	//init topic object
+	topicInit()
+
+	//init waf server
+	wafServInit()
+}
+
+func topicInit() {
 	TopicMap = make(map[int]DataType, 0)
 
 	XdrTopic, _ := mconfig.Conf.String("kafka", "XdrTopicName")
