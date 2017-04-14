@@ -45,7 +45,9 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	topicname, _ := mconfig.Conf.String("kafka", "WafAlertTopicName")
 	data := &DataType{
 		topicName: topicname,
-		//handlePre: mm.handlePre,
+		handlePre: func(data []byte) ([]byte, error) {
+			return data, nil
+		},
 		origiData: content,
 		partition: 0,
 	}
