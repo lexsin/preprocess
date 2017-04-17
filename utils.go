@@ -54,7 +54,7 @@ func IntToBool(u uint32) bool {
 
 func Md5Sum(data []byte) []byte {
 	sum := md5.Sum(data)
-	mlog.Debug("sum[:]=", sum[:])
+	//mlog.Debug("sum[:]=", sum[:])
 	return sum[:]
 }
 

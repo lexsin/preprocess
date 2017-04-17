@@ -13,7 +13,7 @@ import (
 
 func saveToCephPerXdr(obj *xdrParse.DpiXdr) error {
 	jtype := obj.CheckType()
-	mlog.Debug("jtype=", jtype)
+	//mlog.Debug("jtype=", jtype)
 	switch jtype {
 	case xdrParse.XdrType:
 		//xdrTypeToCeph()
@@ -85,10 +85,8 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 
 func xdrFileTypeToCeph(data *xdrParse.DpiXdr) error {
 	//write file
-	mlog.Alert("cephtime1=", time.Now().Unix())
 	content := data.FileContent
 	fileName := createFilenameByMd5(content)
-	mlog.Alert("cephtime2=", time.Now().Unix())
 	rootPath := "/cephfs/DPI/file"
 	path := createPathByTime()
 	fullPath := rootPath + "/" + string(path)
@@ -100,7 +98,6 @@ func xdrFileTypeToCeph(data *xdrParse.DpiXdr) error {
 	}
 	fullFile := fullPath + "/" + string(fileName)
 	wirteFile(fullFile, content)
-	mlog.Alert("cephtime3=", time.Now().Unix())
 	//modify obj
 	data.FileContent = []byte(fullFile)
 
