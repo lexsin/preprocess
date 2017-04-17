@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
-	"preprocess/modules/xdrParse"
-
 	"preprocess/modules/pushkafka"
+	"preprocess/modules/xdrParse"
+	"time"
 
 	"github.com/howeyc/fsnotify"
 )
@@ -30,6 +30,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 			mlog.Error(err)
 		}
 	}()
+	mlog.Alert("time1=", time.Now().Unix())
 	mlog.Debug(fmt.Println("Create file:", ev.Name))
 
 	//check file suffix
@@ -42,23 +43,25 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	if err != nil {
 		panic(fmt.Sprintf("read file %s error:%s", ev.Name, err.Error()))
 	}
-
+	mlog.Alert("time2=", time.Now().Unix())
 	//XDR==>pre object
 	datalist, err := xdrParse.ParseXdr(content)
 	if err != nil {
 		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
 	}
+	mlog.Alert("time3=", time.Now().Unix())
 	//file to ceph
 	saveToCeph(datalist)
+	mlog.Alert("time4=", time.Now().Unix())
 	//pre object ==> backend object
 	backlist := TransToBackendObj(datalist)
-
+	mlog.Alert("time5=", time.Now().Unix())
 	//push to kafka
 	for _, backObj := range backlist {
 		//mlog.Debug("data=", datap)
 		go DoPushTopic(backObj)
 	}
-
+	mlog.Alert("time6=", time.Now().Unix())
 	return nil
 }
 
@@ -69,7 +72,7 @@ func AlertHandler(fileName string, topicName string, suffix string) error {
 		}
 	}()
 	mlog.Debug(fmt.Println("Create file:", fileName))
-
+	mlog.Alert("time1=", time.Now())
 	//check file suffix
 	if ok := CheckSuffix(fileName, suffix); !ok {
 		panic(fmt.Sprintf("file: %s suffix error!", fileName))
