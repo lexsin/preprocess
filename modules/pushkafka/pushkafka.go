@@ -71,10 +71,12 @@ func CreateTopicWriter(topicName string) error {
 				//mlog.Debug("get topic data:", string(data.data))
 				producer := Broker.Producer(kafka.NewProducerConf())
 				msg := &proto.Message{Value: data.data}
+				mlog.Debug("pushkafka before:", time.Now().Nanosecond())
 				if _, err := producer.Produce(topicName, int32(data.partition), msg); err != nil {
 					mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s",
 						topicName, data.partition, err.Error()))
 				}
+				mlog.Debug("pushkafka after:", time.Now().Nanosecond())
 			case <-time.After(waitTimeOut):
 				mlog.Debug("writer(", topicName, ") wait ", time.Duration(waitTimeOut).Seconds(), "s...")
 			}
