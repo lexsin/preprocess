@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	//"crypto/md5"
+	"errors"
 	"fmt"
 	"os"
 	"preprocess/modules/mlog"
@@ -10,20 +11,33 @@ import (
 	"time"
 )
 
+func saveToCephPerXdr(obj *xdrParse.DpiXdr) error {
+	jtype := obj.CheckType()
+	mlog.Debug("jtype=", jtype)
+	switch jtype {
+	case xdrParse.XdrType:
+		//xdrTypeToCeph()
+	case xdrParse.XdrHttpType:
+		if err := xdrHttpTypeToCeph(obj); err != nil {
+			mlog.Error("httpxdr Write ceph error:", err.Error())
+			return err
+		}
+	case xdrParse.XdrFileType:
+		if err := xdrFileTypeToCeph(obj); err != nil {
+			mlog.Error("filexdr Write ceph error:", err.Error())
+			return err
+		}
+	default:
+		mlog.Error("CheckType error! return ", jtype)
+		return errors.New(fmt.Sprintf("CheckType error! return %d", jtype))
+	}
+	mlog.Debug("save to ceph success!")
+	return nil
+}
+
 func saveToCeph(objlist []*xdrParse.DpiXdr) error {
 	for _, obj := range objlist {
-		jtype := obj.CheckType()
-		mlog.Debug("jtype=", jtype)
-		switch jtype {
-		case xdrParse.XdrType:
-			//xdrTypeToCeph()
-		case xdrParse.XdrHttpType:
-			xdrHttpTypeToCeph(obj)
-		case xdrParse.XdrFileType:
-			xdrFileTypeToCeph(obj)
-		default:
-			mlog.Error("CheckType error! return ", jtype)
-		}
+		saveToCephPerXdr(obj)
 	}
 	mlog.Debug("save to ceph success!")
 	return nil
@@ -48,8 +62,12 @@ func xdrHttpTypeToCeph(data *xdrParse.DpiXdr) error {
 	}
 	httprespFile := fullPath + "/" + string(respFileName)
 	httpreqFile := fullPath + "/" + string(reqFileName)
-	wirteFile(httprespFile, httpResp)
-	wirteFile(httpreqFile, httpReq)
+	if err := wirteFile(httprespFile, httpResp); err != nil {
+		return err
+	}
+	if err := wirteFile(httpreqFile, httpReq); err != nil {
+		return err
+	}
 
 	//modify object
 	data.HttpRespInfo = []byte(httprespFile)

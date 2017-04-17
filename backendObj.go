@@ -183,166 +183,171 @@ type BackendObj struct {
 	} `json:"-"`
 }
 
+func PerTransToBackendObj(src *xdrParse.DpiXdr) *BackendInfo {
+	obj := &BackendObj{}
+	//obj.Vendor =
+	//Id
+	if src.Tuple.Version == 0 {
+		obj.Ipv4 = false
+	} else {
+		obj.Ipv4 = true
+	}
+	obj.Class = src.AppId
+	if len(src.HttpReqInfo) != 0 {
+		obj.Type = XdrHttpType
+	} else if len(src.FileContent) != 0 {
+		obj.Type = XdrFileType
+	} else {
+		obj.Type = XdrType
+	}
+	//obj.Time = src.Tuple
+	obj.Conn.Proto = src.Tuple.L4Proto
+	obj.Conn.Sport = src.Tuple.SrcPort
+	obj.Conn.Dport = src.Tuple.DstPort
+	obj.Conn.Sip = Ipv4IntToString(src.Tuple.SrcIpv4)
+	obj.Conn.Dip = Ipv4IntToString(src.Tuple.DstIpv4)
+	//obj.ConnEx.Over =
+	//obj.ConnEx.Dir
+	obj.ConnSt.FlowUp = uint64(src.SesionStat.UpFlow)
+	obj.ConnSt.FlowDown = uint64(src.SesionStat.DownFlow)
+	obj.ConnSt.PktUp = uint64(src.SesionStat.UpPkgNum)
+	obj.ConnSt.PktDown = uint64(src.SesionStat.DownPkgNum)
+	//obj.ConnSt.IpFragUp =
+	//obj.ConnSt.IpFragDown
+	obj.ConnTime.Start = src.SesionTime.StartTime
+	obj.ConnTime.End = src.SesionTime.EndTIme
+	//obj.ServSt.FlowUp
+	//obj.ServSt.FlowDown
+	//obj.ServSt.PktUp
+	//obj.ServSt.PktDown
+	//obj.ServSt.IpFragUp
+	//obj.ServSt.IpFragDown
+	//obj.ServSt.TcpDisorderUp
+	//obj.ServSt.TcpDisorderDown
+	//obj.ServSt.TcpRetranUp
+	//obj.ServSt.TcpRetranDown
+
+	//obj.Tcp.DisorderUp =
+	//obj.Tcp.DisorderDown
+	obj.Tcp.SynAckDelay = src.TcpInfo.SynackToSynTime
+	obj.Tcp.AckDelay = src.TcpInfo.AckToSynTime
+	obj.Tcp.ReportFlag = src.TcpInfo.UbReportFlag
+	obj.Tcp.CloseReason = src.TcpInfo.CloseSsnReason
+	obj.Tcp.FirstRequestDelay = src.TcpInfo.FirstRequestDelay
+	obj.Tcp.FirstResponseDely = src.TcpInfo.FirstResponseDely
+	obj.Tcp.Window = src.TcpInfo.TcpWindow
+	obj.Tcp.Mss = src.TcpInfo.Mss
+	//obj.Tcp.SynCount = src.TcpInfo.
+	//obj.Tcp.SynAckCount
+	obj.Tcp.AckCount = src.TcpInfo.TcpAckCount
+	//obj.Tcp.SessionOK =
+	if src.TcpInfo.TcpStatusFirst == 0 {
+		obj.Tcp.Handshake12 = true
+	} else {
+		obj.Tcp.Handshake12 = false
+	}
+	if src.TcpInfo.TcpStatusSecond == 0 {
+		obj.Tcp.Handshake23 = true
+	} else {
+		obj.Tcp.Handshake23 = false
+	}
+
+	//obj.Tcp.Open =
+	//obj.Tcp.Close
+
+	obj.Http.Host = src.HttpInfo.HttpHost
+	obj.Http.Url = src.HttpInfo.HttpUrl
+	obj.Http.XonlineHost = src.HttpInfo.HttpOnlineHost
+	obj.Http.UserAgent = src.HttpInfo.HttpUserAgent
+	obj.Http.ContentType = src.HttpInfo.HttpContent
+	obj.Http.Refer = src.HttpInfo.HttpRefer
+	obj.Http.Cookie = src.HttpInfo.HttpCookie
+	obj.Http.Location = src.HttpInfo.HttpLocation
+	obj.Http.Request = string(src.HttpReqInfo)
+	obj.Http.Response = string(src.HttpRespInfo)
+	obj.Http.RequestTime = src.HttpBaseInfo.Ulactiontime
+	obj.Http.FirstResponseTime = src.HttpBaseInfo.Ulfirst_packet_time
+	obj.Http.LastContentTime = src.HttpBaseInfo.UlLast_Packet_Time
+	obj.Http.ServTime = src.HttpBaseInfo.UlServiceTime
+	obj.Http.ContentLen = src.HttpBaseInfo.UlContentLenth
+	obj.Http.StateCode = src.HttpBaseInfo.UsHttpStatus
+	obj.Http.Method = src.HttpBaseInfo.UcHttpMethod
+	obj.Http.Version = src.HttpBaseInfo.Uchttpversion
+	obj.Http.HeadFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0x04))
+	obj.Http.ServFlag = uint8(src.HttpBaseInfo.UcUnionFlag & 0x38)
+	obj.Http.RequestFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0xc0))
+	obj.Http.Browser = src.HttpBaseInfo.UcIE
+	obj.Http.Portal = src.HttpBaseInfo.UcPortal
+	obj.Sip.CallingNo = src.SipCaller
+	obj.Sip.CalledNo = src.SipCalled
+	obj.Sip.SessionId = src.SipSessionId
+	obj.Sip.CallDir = src.Sip.UcCallDirection
+	obj.Sip.CallType = src.Sip.UcCallType
+	obj.Sip.HangupReason = src.Sip.UcHookReason
+	obj.Sip.SignalType = src.Sip.UcSignalType
+	obj.Sip.StreamCount = src.Sip.UsDataflowNum
+	obj.Sip.Malloc = IntToBool(uint32(src.Sip.UbSipIVMR & 0x2000))
+	obj.Sip.Bye = IntToBool(uint32(src.Sip.UbSipIVMR & 0x4000))
+	obj.Sip.Invite = IntToBool(uint32(src.Sip.UbSipIVMR & 0x8000))
+	obj.Rtsp.Url = src.RtspUrl
+	obj.Rtsp.UserAgent = src.RtspUserAgent
+	obj.Rtsp.ServerIp = src.RtspServerIp
+	obj.Rtsp.ClientBeginPort = src.RTSP.UsCStartPort
+	obj.Rtsp.ClientEndPort = src.RTSP.UsCEndPort
+	obj.Rtsp.ServerBeginPort = src.RTSP.UsSStartPort
+	obj.Rtsp.ServerEndPort = src.RTSP.UsSEndPort
+	obj.Rtsp.VideoStreamCount = src.RTSP.UsSsnVideoCount
+	obj.Rtsp.AudeoStreamCount = src.RTSP.UsSsnAudioCount
+	obj.Rtsp.ResDelay = src.RTSP.UlResDelay
+	obj.Ftp.State = src.FtpInfo.FtpStatus
+	//obj.Ftp.UserCount = src.FtpInfo.FtpUserName//??
+	obj.Ftp.CurrentDir = src.FtpInfo.FtpCurDir
+	obj.Ftp.TransMode = src.FtpInfo.FtpTransMode
+	obj.Ftp.TransType = src.FtpInfo.FtpTransType
+	//obj.Ftp.FileCount =
+	obj.Ftp.FileSize = src.FtpInfo.FtpFileSize
+	obj.Ftp.RspTm = src.FtpInfo.FtpRspTm
+	obj.Ftp.TransTm = src.FtpInfo.FtpTransTime
+	obj.Mail.MsgType = src.MailInfo.MailMsgType
+	obj.Mail.RspState = src.MailInfo.MailRspStatus
+	obj.Mail.UserName = src.MailInfo.MailUserName
+	obj.Mail.RecverInfo = src.MailInfo.MailResvInfo
+	obj.Mail.Len = src.MailInfo.MailLength
+	obj.Mail.DomainInfo = src.MailInfo.MailDomainInfo
+	obj.Mail.RecvAccount = src.MailInfo.MailRcevAcnt
+	obj.Mail.Hdr = src.MailInfo.MailHdr
+	obj.Mail.AcsType = src.MailInfo.MailAcsType
+	obj.Dns.Domain = src.DnsInfo.DnsZones
+	obj.Dns.IpCount = src.DnsInfo.DnsIpNum
+	obj.Dns.Ipv4 = src.DnsInfo.DnsIpv4
+	obj.Dns.Ipv6 = src.DnsInfo.DnsIpv6
+	obj.Dns.RspCode = src.DnsInfo.DnsRspCode
+	obj.Dns.ReqCount = src.DnsInfo.DnsRsqCnt
+	obj.Dns.RspRecordCount = src.DnsInfo.DnsRspRecordCnt
+	obj.Dns.AuthCnttCount = src.DnsInfo.DnsAuthCnttCnt
+	obj.Dns.ExtraRecordCount = src.DnsInfo.DnsExtraRecordCnt
+	obj.Dns.RspDelay = src.DnsInfo.DnsRspDelay
+	//obj.Dns.PktValid =
+	//obj.Vpn.Type =
+	//obj.Proxy
+	//obj.QQ
+
+	//obj.App.ProtoInfo
+	//obj.App.Status
+	//obj.App.ClassId
+	//obj.App.Proto
+	obj.App.File = string(src.FileContent)
+	info := &BackendInfo{
+		Type: src.CheckType(),
+		Data: obj,
+	}
+	return info
+}
+
 func TransToBackendObj(origiList []*xdrParse.DpiXdr) []*BackendInfo {
 	list := []*BackendInfo{}
 	for _, src := range origiList {
-		obj := &BackendObj{}
-		//obj.Vendor =
-		//Id
-		if src.Tuple.Version == 0 {
-			obj.Ipv4 = false
-		} else {
-			obj.Ipv4 = true
-		}
-		obj.Class = src.AppId
-		if len(src.HttpReqInfo) != 0 {
-			obj.Type = XdrHttpType
-		} else if len(src.FileContent) != 0 {
-			obj.Type = XdrFileType
-		} else {
-			obj.Type = XdrType
-		}
-		//obj.Time = src.Tuple
-		obj.Conn.Proto = src.Tuple.L4Proto
-		obj.Conn.Sport = src.Tuple.SrcPort
-		obj.Conn.Dport = src.Tuple.DstPort
-		obj.Conn.Sip = Ipv4IntToString(src.Tuple.SrcIpv4)
-		obj.Conn.Dip = Ipv4IntToString(src.Tuple.DstIpv4)
-		//obj.ConnEx.Over =
-		//obj.ConnEx.Dir
-		obj.ConnSt.FlowUp = uint64(src.SesionStat.UpFlow)
-		obj.ConnSt.FlowDown = uint64(src.SesionStat.DownFlow)
-		obj.ConnSt.PktUp = uint64(src.SesionStat.UpPkgNum)
-		obj.ConnSt.PktDown = uint64(src.SesionStat.DownPkgNum)
-		//obj.ConnSt.IpFragUp =
-		//obj.ConnSt.IpFragDown
-		obj.ConnTime.Start = src.SesionTime.StartTime
-		obj.ConnTime.End = src.SesionTime.EndTIme
-		//obj.ServSt.FlowUp
-		//obj.ServSt.FlowDown
-		//obj.ServSt.PktUp
-		//obj.ServSt.PktDown
-		//obj.ServSt.IpFragUp
-		//obj.ServSt.IpFragDown
-		//obj.ServSt.TcpDisorderUp
-		//obj.ServSt.TcpDisorderDown
-		//obj.ServSt.TcpRetranUp
-		//obj.ServSt.TcpRetranDown
-
-		//obj.Tcp.DisorderUp =
-		//obj.Tcp.DisorderDown
-		obj.Tcp.SynAckDelay = src.TcpInfo.SynackToSynTime
-		obj.Tcp.AckDelay = src.TcpInfo.AckToSynTime
-		obj.Tcp.ReportFlag = src.TcpInfo.UbReportFlag
-		obj.Tcp.CloseReason = src.TcpInfo.CloseSsnReason
-		obj.Tcp.FirstRequestDelay = src.TcpInfo.FirstRequestDelay
-		obj.Tcp.FirstResponseDely = src.TcpInfo.FirstResponseDely
-		obj.Tcp.Window = src.TcpInfo.TcpWindow
-		obj.Tcp.Mss = src.TcpInfo.Mss
-		//obj.Tcp.SynCount = src.TcpInfo.
-		//obj.Tcp.SynAckCount
-		obj.Tcp.AckCount = src.TcpInfo.TcpAckCount
-		//obj.Tcp.SessionOK =
-		if src.TcpInfo.TcpStatusFirst == 0 {
-			obj.Tcp.Handshake12 = true
-		} else {
-			obj.Tcp.Handshake12 = false
-		}
-		if src.TcpInfo.TcpStatusSecond == 0 {
-			obj.Tcp.Handshake23 = true
-		} else {
-			obj.Tcp.Handshake23 = false
-		}
-
-		//obj.Tcp.Open =
-		//obj.Tcp.Close
-
-		obj.Http.Host = src.HttpInfo.HttpHost
-		obj.Http.Url = src.HttpInfo.HttpUrl
-		obj.Http.XonlineHost = src.HttpInfo.HttpOnlineHost
-		obj.Http.UserAgent = src.HttpInfo.HttpUserAgent
-		obj.Http.ContentType = src.HttpInfo.HttpContent
-		obj.Http.Refer = src.HttpInfo.HttpRefer
-		obj.Http.Cookie = src.HttpInfo.HttpCookie
-		obj.Http.Location = src.HttpInfo.HttpLocation
-		obj.Http.Request = string(src.HttpReqInfo)
-		obj.Http.Response = string(src.HttpRespInfo)
-		obj.Http.RequestTime = src.HttpBaseInfo.Ulactiontime
-		obj.Http.FirstResponseTime = src.HttpBaseInfo.Ulfirst_packet_time
-		obj.Http.LastContentTime = src.HttpBaseInfo.UlLast_Packet_Time
-		obj.Http.ServTime = src.HttpBaseInfo.UlServiceTime
-		obj.Http.ContentLen = src.HttpBaseInfo.UlContentLenth
-		obj.Http.StateCode = src.HttpBaseInfo.UsHttpStatus
-		obj.Http.Method = src.HttpBaseInfo.UcHttpMethod
-		obj.Http.Version = src.HttpBaseInfo.Uchttpversion
-		obj.Http.HeadFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0x04))
-		obj.Http.ServFlag = uint8(src.HttpBaseInfo.UcUnionFlag & 0x38)
-		obj.Http.RequestFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0xc0))
-		obj.Http.Browser = src.HttpBaseInfo.UcIE
-		obj.Http.Portal = src.HttpBaseInfo.UcPortal
-		obj.Sip.CallingNo = src.SipCaller
-		obj.Sip.CalledNo = src.SipCalled
-		obj.Sip.SessionId = src.SipSessionId
-		obj.Sip.CallDir = src.Sip.UcCallDirection
-		obj.Sip.CallType = src.Sip.UcCallType
-		obj.Sip.HangupReason = src.Sip.UcHookReason
-		obj.Sip.SignalType = src.Sip.UcSignalType
-		obj.Sip.StreamCount = src.Sip.UsDataflowNum
-		obj.Sip.Malloc = IntToBool(uint32(src.Sip.UbSipIVMR & 0x2000))
-		obj.Sip.Bye = IntToBool(uint32(src.Sip.UbSipIVMR & 0x4000))
-		obj.Sip.Invite = IntToBool(uint32(src.Sip.UbSipIVMR & 0x8000))
-		obj.Rtsp.Url = src.RtspUrl
-		obj.Rtsp.UserAgent = src.RtspUserAgent
-		obj.Rtsp.ServerIp = src.RtspServerIp
-		obj.Rtsp.ClientBeginPort = src.RTSP.UsCStartPort
-		obj.Rtsp.ClientEndPort = src.RTSP.UsCEndPort
-		obj.Rtsp.ServerBeginPort = src.RTSP.UsSStartPort
-		obj.Rtsp.ServerEndPort = src.RTSP.UsSEndPort
-		obj.Rtsp.VideoStreamCount = src.RTSP.UsSsnVideoCount
-		obj.Rtsp.AudeoStreamCount = src.RTSP.UsSsnAudioCount
-		obj.Rtsp.ResDelay = src.RTSP.UlResDelay
-		obj.Ftp.State = src.FtpInfo.FtpStatus
-		//obj.Ftp.UserCount = src.FtpInfo.FtpUserName//??
-		obj.Ftp.CurrentDir = src.FtpInfo.FtpCurDir
-		obj.Ftp.TransMode = src.FtpInfo.FtpTransMode
-		obj.Ftp.TransType = src.FtpInfo.FtpTransType
-		//obj.Ftp.FileCount =
-		obj.Ftp.FileSize = src.FtpInfo.FtpFileSize
-		obj.Ftp.RspTm = src.FtpInfo.FtpRspTm
-		obj.Ftp.TransTm = src.FtpInfo.FtpTransTime
-		obj.Mail.MsgType = src.MailInfo.MailMsgType
-		obj.Mail.RspState = src.MailInfo.MailRspStatus
-		obj.Mail.UserName = src.MailInfo.MailUserName
-		obj.Mail.RecverInfo = src.MailInfo.MailResvInfo
-		obj.Mail.Len = src.MailInfo.MailLength
-		obj.Mail.DomainInfo = src.MailInfo.MailDomainInfo
-		obj.Mail.RecvAccount = src.MailInfo.MailRcevAcnt
-		obj.Mail.Hdr = src.MailInfo.MailHdr
-		obj.Mail.AcsType = src.MailInfo.MailAcsType
-		obj.Dns.Domain = src.DnsInfo.DnsZones
-		obj.Dns.IpCount = src.DnsInfo.DnsIpNum
-		obj.Dns.Ipv4 = src.DnsInfo.DnsIpv4
-		obj.Dns.Ipv6 = src.DnsInfo.DnsIpv6
-		obj.Dns.RspCode = src.DnsInfo.DnsRspCode
-		obj.Dns.ReqCount = src.DnsInfo.DnsRsqCnt
-		obj.Dns.RspRecordCount = src.DnsInfo.DnsRspRecordCnt
-		obj.Dns.AuthCnttCount = src.DnsInfo.DnsAuthCnttCnt
-		obj.Dns.ExtraRecordCount = src.DnsInfo.DnsExtraRecordCnt
-		obj.Dns.RspDelay = src.DnsInfo.DnsRspDelay
-		//obj.Dns.PktValid =
-		//obj.Vpn.Type =
-		//obj.Proxy
-		//obj.QQ
-
-		//obj.App.ProtoInfo
-		//obj.App.Status
-		//obj.App.ClassId
-		//obj.App.Proto
-		obj.App.File = string(src.FileContent)
-		info := &BackendInfo{
-			Type: src.CheckType(),
-			Data: obj,
-		}
+		info := PerTransToBackendObj(src)
 		list = append(list, info)
 	}
 	return list

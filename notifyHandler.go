@@ -30,38 +30,83 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 			mlog.Error(err)
 		}
 	}()
+	var filename = ev.Name
 	mlog.Alert("time1=", time.Now().Unix())
-	mlog.Debug(fmt.Println("Create file:", ev.Name))
+	mlog.Debug(fmt.Println("Create file:", filename))
 
 	//check file suffix
-	if ok := CheckSuffix(ev.Name, []string{"xdr", "XDR"}...); !ok {
-		panic(fmt.Sprintf("file: %s suffix error!", ev.Name))
+	if ok := CheckSuffix(filename, []string{"xdr", "XDR"}...); !ok {
+		panic(fmt.Sprintf("file: %s suffix error!", filename))
 	}
 
 	//read file
-	content, err := ReadFile(ev.Name)
+	content, err := ReadFile(filename)
 	if err != nil {
-		panic(fmt.Sprintf("read file %s error:%s", ev.Name, err.Error()))
+		panic(fmt.Sprintf("read file %s error:%s", filename, err.Error()))
 	}
 	mlog.Alert("time2=", time.Now().Unix())
 	//XDR==>pre object
 	datalist, err := xdrParse.ParseXdr(content)
 	if err != nil {
-		panic(fmt.Sprintf("parse file %s Xdr error:%s", ev.Name, err.Error()))
+		panic(fmt.Sprintf("parse file %s Xdr error:%s", filename, err.Error()))
 	}
 	mlog.Alert("time3=", time.Now().Unix())
 	//file to ceph
-	saveToCeph(datalist)
-	mlog.Alert("time4=", time.Now().Unix())
-	//pre object ==> backend object
-	backlist := TransToBackendObj(datalist)
-	mlog.Alert("time5=", time.Now().Unix())
-	//push to kafka
-	for _, backObj := range backlist {
-		//mlog.Debug("data=", datap)
-		go DoPushTopic(backObj)
+	count, _ := dealForeachXdrs(datalist)
+	mlog.Debug("file", filename, "has xdr", count)
+	return nil
+}
+
+func dealForeachXdrs(xdrs []*xdrParse.DpiXdr) (int, error) {
+	var count = 0
+	for _, xdr := range xdrs {
+		//check type
+		xtype := xdr.CheckType()
+		switch xtype {
+		case xdrParse.XdrType:
+			dealXdrCommon(xdr)
+		case xdrParse.XdrHttpType:
+			go dealHttpFileXdr(xdr)
+		case xdrParse.XdrFileType:
+			go dealHttpFileXdr(xdr)
+		default:
+			mlog.Error("CheckType error! return ", xtype)
+		}
+		count++
 	}
-	mlog.Alert("time6=", time.Now().Unix())
+	return count, nil
+}
+
+/*
+ * deal xdr which is http or file,need save to ceph
+ */
+func dealHttpFileXdr(xdr *xdrParse.DpiXdr) error {
+	//1.save to ceph
+	if err := saveToCephPerXdr(xdr); err != nil {
+		return err
+	}
+	//2.pre obj --> backend obj
+	backend := PerTransToBackendObj(xdr)
+
+	//3.push to kafka
+	if err := DoPushTopic(backend); err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+ * deal xdr not http and file,not need save to ceph
+ */
+func dealXdrCommon(xdr *xdrParse.DpiXdr) error {
+	//0.save to ceph
+	//no need
+	//1.pre obj --> backend obj
+	backend := PerTransToBackendObj(xdr)
+	//2.push to kafka
+	if err := DoPushTopic(backend); err != nil {
+		return err
+	}
 	return nil
 }
 
