@@ -21,7 +21,7 @@ func IdsAlertHandler(ev *fsnotify.FileEvent) error {
 
 func VdsAlertHandler(ev *fsnotify.FileEvent) error {
 	topicname, _ := mconfig.Conf.String("kafka", "VdsAlertTopicName")
-	return AlertHandler(ev.Name, topicname, "alert")
+	return AlertHandler(ev.Name, topicname, "xdr")
 }
 
 func DpiHandle(ev *fsnotify.FileEvent) error {
