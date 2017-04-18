@@ -82,5 +82,4 @@ func initFuncMap() {
 	DecodeFuncMap[XDR_HTTP_REQ_INFO] = parsHttpRespInfo
 	DecodeFuncMap[XDR_HTTP_RESP_INFO] = parsHttpReqInfo
 	DecodeFuncMap[XDR_FILE_CONTENT] = parsFileContent
-
 }

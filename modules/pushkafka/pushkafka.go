@@ -44,7 +44,15 @@ func PushKafka(info PushKafkaer) error {
 		data:      data,
 		partition: info.Partition(),
 	}
-	writer <- datainfo
+	for {
+		select {
+		case writer <- datainfo:
+		default:
+			mlog.Alert("topic:", topic, "wirte wait...")
+			<-time.After(1 * time.Second)
+		}
+	}
+
 	mlog.Debug("push topic(", topic, ") partation(", datainfo.partition, ")success!")
 	return nil
 }
