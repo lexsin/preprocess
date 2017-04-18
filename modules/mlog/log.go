@@ -115,6 +115,29 @@ func generateFmtStr(n int) string {
 	return strings.Repeat("%v ", n)
 }
 
+func GetMlogLevel(input string) int {
+	level := 0
+	switch input {
+	case "Emergency":
+		level = logs.LevelEmergency
+	case "Critical":
+		level = logs.LevelCritical
+	case "Error":
+		level = logs.LevelError
+	case "Warning":
+		level = logs.LevelWarning
+	case "Notice":
+		level = logs.LevelNotice
+	case "Informational":
+		level = logs.LevelInformational
+	case "Debug":
+		level = logs.LevelDebug
+	default:
+		level = logs.LevelInformational
+	}
+	return level
+}
+
 func init() {
 	SetLogger("file", `{"filename":"logs/server.log"}`)
 	SetLogger("console", "")

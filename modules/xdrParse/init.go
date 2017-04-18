@@ -1,8 +1,28 @@
 package xdrParse
 
+import (
+	"preprocess/modules/mconfig"
+	"preprocess/modules/mlog"
+)
+
 var DecodeFuncMap map[int]func(xdr *TlvValue, obj *DpiXdr) error
 
 func init() {
+	initDebug()
+	initFuncMap()
+	errInit()
+}
+
+func initDebug() {
+	level, _ := mconfig.Conf.String("debug", "parseXdrLevel")
+	mlogLevel := mlog.GetMlogLevel(level)
+	//init log
+	mlog.SetLogger("file", `{"filename":"logs/xdrParse/server.log"}`)
+	mlog.SetLogger("console", "")
+	mlog.SetLogLevel(mlogLevel)
+}
+
+func initFuncMap() {
 	DecodeFuncMap = make(map[int]func(xdr *TlvValue, obj *DpiXdr) error, 0)
 
 	DecodeFuncMap[XDR_SESSION_STATUS] = ParsSessionStatus
@@ -63,5 +83,4 @@ func init() {
 	DecodeFuncMap[XDR_HTTP_RESP_INFO] = parsHttpReqInfo
 	DecodeFuncMap[XDR_FILE_CONTENT] = parsFileContent
 
-	errInit()
 }
