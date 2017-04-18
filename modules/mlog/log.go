@@ -117,20 +117,20 @@ func generateFmtStr(n int) string {
 
 func GetMlogLevel(input string) int {
 	level := 0
-	switch input {
-	case "Emergency":
+	switch strings.ToLower(input) {
+	case "emergency":
 		level = logs.LevelEmergency
-	case "Critical":
+	case "critical":
 		level = logs.LevelCritical
-	case "Error":
+	case "error":
 		level = logs.LevelError
-	case "Warning":
+	case "warning":
 		level = logs.LevelWarning
-	case "Notice":
+	case "notice":
 		level = logs.LevelNotice
-	case "Informational":
+	case "informational":
 		level = logs.LevelInformational
-	case "Debug":
+	case "debug":
 		level = logs.LevelDebug
 	default:
 		level = logs.LevelInformational
