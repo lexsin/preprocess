@@ -48,7 +48,7 @@ func PushKafka(info PushKafkaer) error {
 		select {
 		case writer <- datainfo:
 			mlog.Debug("push topic(", topic, ") partation(", datainfo.partition, ")success!")
-			break
+			return
 		default:
 			mlog.Alert("topic:", topic, "wirte wait...")
 			<-time.After(1 * time.Second)
