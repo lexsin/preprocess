@@ -2,7 +2,7 @@ package xdrParse
 
 import (
 	"preprocess/modules/mconfig"
-	"preprocess/modules/mlog"
+	//"preprocess/modules/mlog"
 )
 
 var DecodeFuncMap map[int]func(xdr *TlvValue, obj *DpiXdr) error
@@ -14,12 +14,12 @@ func init() {
 }
 
 func initDebug() {
-	level, _ := mconfig.Conf.String("debug", "parseXdrLevel")
-	mlogLevel := mlog.GetMlogLevel(level)
+	level, _ := mconfig.Conf.String("debug", "xdrParseLevel")
+	mlogLevel := GetMlogLevel(level)
 	//init log
-	mlog.SetLogger("file", `{"filename":"logs/xdrParse/server.log"}`)
-	mlog.SetLogger("console", "")
-	mlog.SetLogLevel(mlogLevel)
+	SetLogger("file", `{"filename":"logs/xdrParse/server.log"}`)
+	SetLogger("console", "")
+	SetLogLevel(mlogLevel)
 }
 
 func initFuncMap() {

@@ -165,8 +165,8 @@ func parsHttpBaseInfo(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsHttpHost(xdr *TlvValue, obj *DpiXdr) error {
 	//11
-	//mlog.Debug("xdr.data=", xdr.Data)
-	//mlog.Debug("string(xdr.Data)=", string(xdr.Data))
+	//Debug("xdr.data=", xdr.Data)
+	//Debug("string(xdr.Data)=", string(xdr.Data))
 	obj.HttpInfo.HttpHost = string(xdr.Data)
 	return nil
 }
@@ -469,14 +469,14 @@ func parsDnsRspDelay(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsHttpRespInfo(xdr *TlvValue, obj *DpiXdr) error {
 	//201
-	//mlog.Debug("obj.HttpRespInfo=", string(xdr.Data))
+	//Debug("obj.HttpRespInfo=", string(xdr.Data))
 	obj.HttpRespInfo = xdr.Data
 	return nil
 }
 
 func parsHttpReqInfo(xdr *TlvValue, obj *DpiXdr) error {
 	//202
-	//mlog.Debug("obj.HttpReqInfo=", string(xdr.Data))
+	//Debug("obj.HttpReqInfo=", string(xdr.Data))
 	obj.HttpReqInfo = xdr.Data
 	return nil
 }
