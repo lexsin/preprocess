@@ -59,11 +59,13 @@ func initVariate() {
 
 	IdsAlertTopic, err = mconfig.Conf.String("kafka", "IdsAlertTopicName")
 	if err != nil {
-		panic("[kafka]IdsAlertTopicName not config")
+		mlog.Error("[kafka]IdsAlertTopicName not config")
+		panic(ErrNotConfErr)
 	}
 	VdsAlertTopic, err = mconfig.Conf.String("kafka", "VdsAlertTopicName")
 	if err != nil {
-		panic("[kafka]VdsAlertTopicName not config")
+		mlog.Error("[kafka]VdsAlertTopicName not config")
+		panic(ErrNotConfErr)
 	}
 }
 

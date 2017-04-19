@@ -10,6 +10,7 @@ var ErrXdrParseErr = errors.New("xdrParseErr")
 var ErrSuffixErr = errors.New("suffixErr")
 var ErrReadFileErr = errors.New("readFileErr")
 var ErrPushKafkaErr = errors.New("pushKafkaErr")
+var ErrNotConfErr = errors.New("NotConfErr")
 
 func isXdrPkgErr(err error) bool {
 	var errPkgMap = map[error]int{

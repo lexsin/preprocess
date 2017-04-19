@@ -19,7 +19,7 @@ func init() {
 	Broker, err = kafka.Dial(kafkaAddrs, conf)
 	if err != nil {
 		mlog.Error(err)
-		panic(fmt.Sprintf("kafka.Dial %s", err.Error()))
+		panic("kafka.Dial ", err.Error()))
 	}
 	mlog.Info("connect kafka success!")
 	//defer broker.Close()

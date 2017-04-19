@@ -174,7 +174,8 @@ func AlertHandler(fileName string, topicName string, suffix string) error {
 	mlog.Debug(fmt.Println("Create file:", fileName))
 	//check file suffix
 	if ok := CheckSuffix(fileName, suffix); !ok {
-		panic(fmt.Sprintf("file: %s suffix error!", fileName))
+		mlog.Debug(fmt.Sprintf("file: %s suffix error!", fileName))
+		panic(ErrSuffixErr)
 	}
 
 	//push kafka

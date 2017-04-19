@@ -372,7 +372,7 @@ func (this *BackendObj) HashPartation() uint32 {
 	partitionNum, err := mconfig.Conf.Int("kafka", "AgentNum")
 	if err != nil {
 		mlog.Error("app.conf AgentNum error")
-		panic("app.conf AgentNum error")
+		panic(ErrNotConfErr)
 	}
 
 	sum := Ipv4StringToInt(this.Conn.Sip) +
@@ -381,7 +381,8 @@ func (this *BackendObj) HashPartation() uint32 {
 		uint32(this.Conn.Sport) +
 		uint32(this.Conn.Proto)
 	if err != nil {
-		panic("[kafka]AgentNum not conf")
+		mlog.Error("app.conf AgentNum error")
+		panic(ErrNotConfErr)
 	}
 	return uint32(uint32(sum) % uint32(partitionNum))
 }
