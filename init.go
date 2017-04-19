@@ -15,8 +15,8 @@ var AgentNum int
 
 const (
 	XdrType = iota
-	XdrHttpType
 	XdrFileType
+	XdrHttpType
 )
 
 var DpiWatchDir string

@@ -200,8 +200,8 @@ func PerTransToBackendObj(src *xdrParse.DpiXdr) *BackendInfo {
 	} else {
 		obj.Type = XdrType
 	}
-	//obj.Time = src.Tuple
-	obj.Conn.Proto = src.Tuple.L4Proto
+	obj.Time = src.Tuple
+	obj.Conn.Proto = src.SesionTime.StartTime
 	obj.Conn.Sport = src.Tuple.SrcPort
 	obj.Conn.Dport = src.Tuple.DstPort
 	obj.Conn.Sip = Ipv4IntToString(src.Tuple.SrcIpv4)
