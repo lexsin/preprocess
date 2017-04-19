@@ -42,8 +42,8 @@ type TlvValue struct {
 
 const (
 	XdrType = iota
-	XdrHttpType
 	XdrFileType
+	XdrHttpType
 )
 
 func parseOneXdr(xdr *TlvValue, obj *DpiXdr) error {
