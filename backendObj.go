@@ -20,7 +20,7 @@ type BackendObj struct {
 	Ipv4   bool   `json:Ipv4`
 	Class  uint8  `json:Class`
 	Type   uint32 `json:Type`
-	Time   string `json:Time`
+	Time   uint64 `json:Time`
 	Conn   struct {
 		Proto uint8  `json:Proto`
 		Sport uint16 `json:Sport`
@@ -200,8 +200,8 @@ func PerTransToBackendObj(src *xdrParse.DpiXdr) *BackendInfo {
 	} else {
 		obj.Type = XdrType
 	}
-	obj.Time = src.Tuple
-	obj.Conn.Proto = src.SesionTime.StartTime
+	obj.Time = src.SesionTime.StartTime
+	obj.Conn.Proto = src.Tuple.L4Proto
 	obj.Conn.Sport = src.Tuple.SrcPort
 	obj.Conn.Dport = src.Tuple.DstPort
 	obj.Conn.Sip = Ipv4IntToString(src.Tuple.SrcIpv4)
