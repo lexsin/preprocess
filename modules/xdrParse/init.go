@@ -1,11 +1,15 @@
 package xdrParse
 
 import (
+	"errors"
 	"preprocess/modules/mconfig"
 	//"preprocess/modules/mlog"
 )
 
 var DecodeFuncMap map[int]func(xdr *TlvValue, obj *DpiXdr) error
+
+var ErrXdrParsFirstFloorErr = errors.New("xdrParsFirstFloorErr")
+var ErrXdrParsScdFloorErr = errors.New("xdrParsScdFloorErr")
 
 func init() {
 	initDebug()

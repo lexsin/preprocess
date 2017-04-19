@@ -130,6 +130,7 @@ func dealForeachXdrs(xdrs []*xdrParse.DpiXdr) (count int, success int) {
 		}
 	}
 	success = success1 + success2
+	mlog.Debug("xdr count=", count, "recieve success=", success1+success2)
 	return
 }
 

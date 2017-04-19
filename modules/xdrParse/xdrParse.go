@@ -66,13 +66,13 @@ func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
 	tlvValues, err := RangeToObj(origiData)
 	if err != nil {
 		Error("first floor RangeToObj err:" + err.Error())
-		panic("first floor RangeToObj err:" + err.Error())
+		panic(ErrXdrParsFirstFloorErr)
 	}
 	for _, tlv := range tlvValues {
 		xdrs, err := RangeToObj(tlv.Data)
 		if err != nil {
 			Error("second floor RangeToObj err:" + err.Error())
-			panic("second floor RangeToObj err:" + err.Error())
+			panic(ErrXdrParsScdFloorErr)
 			//return nil, err
 		}
 		//mlog.Debug("xdrs=", xdrs)
