@@ -17,7 +17,7 @@ import (
 func IdsAlertHandler(ev *fsnotify.FileEvent) error {
 	defer func() {
 		err := recover()
-		dealFileByErr_idsAlert(err.(error), ev.Name)
+		dealFileByErr_idsAlert(err, ev.Name)
 		if err != nil {
 			mlog.Error(err)
 		}
@@ -28,7 +28,7 @@ func IdsAlertHandler(ev *fsnotify.FileEvent) error {
 func VdsAlertHandler(ev *fsnotify.FileEvent) error {
 	defer func() {
 		err := recover()
-		dealFileByErr_vdsAlert(err.(error), ev.Name)
+		dealFileByErr_vdsAlert(err, ev.Name)
 		if err != nil {
 			mlog.Error(err)
 		}
@@ -40,7 +40,7 @@ func DpiHandle(ev *fsnotify.FileEvent) error {
 	var filename = ev.Name
 	defer func() {
 		err := recover()
-		dealFileByErr_dpi(err.(error), filename)
+		dealFileByErr_dpi(err, filename)
 		if err != nil {
 			mlog.Error(err)
 		}
@@ -230,11 +230,11 @@ func DoPushTopic(backObj *BackendInfo) error {
 	return nil
 }
 
-func dealFileByErr_dpi(err error, filename string) error {
-	if err == nil {
+func dealFileByErr_dpi(errer interface{}, filename string) error {
+	if errer == nil {
 		deleteFileSwitch(filename, DoDelDpi, "")
 	} else {
-		if isXdrPkgErr(err) {
+		if isXdrPkgErr(errer.(error)) {
 			deleteFileSwitch(filename, DoDelIlegalDpi, DpiWatchDir+"/illegal/")
 		} else {
 			deleteFileSwitch(filename, true, DpiWatchDir+"/bak/")
@@ -242,16 +242,16 @@ func dealFileByErr_dpi(err error, filename string) error {
 	}
 	return nil
 }
-func dealFileByErr_vdsAlert(err error, filename string) error {
-	if err == nil {
+func dealFileByErr_vdsAlert(errer interface{}, filename string) error {
+	if errer == nil {
 		deleteFileSwitch(filename, DoDeleteVdsAlert, "")
 	} else {
 		deleteFileSwitch(filename, true, VdsAlertWatchDir+"/bak/")
 	}
 	return nil
 }
-func dealFileByErr_idsAlert(err error, filename string) error {
-	if err == nil {
+func dealFileByErr_idsAlert(errer interface{}, filename string) error {
+	if errer == nil {
 		deleteFileSwitch(filename, DoDeleteIdsAlert, "")
 	} else {
 		deleteFileSwitch(filename, true, IdsAlertWatchDir+"/bak/")
