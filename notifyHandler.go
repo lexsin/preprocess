@@ -5,84 +5,141 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"preprocess/modules/mconfig"
+	//"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
 	"preprocess/modules/pushkafka"
 	"preprocess/modules/xdrParse"
-	"time"
+	//"time"
 
 	"github.com/howeyc/fsnotify"
 )
 
 func IdsAlertHandler(ev *fsnotify.FileEvent) error {
-	topicname, _ := mconfig.Conf.String("kafka", "IdsAlertTopicName")
-	return AlertHandler(ev.Name, topicname, "xdr")
-}
-
-func VdsAlertHandler(ev *fsnotify.FileEvent) error {
-	topicname, _ := mconfig.Conf.String("kafka", "VdsAlertTopicName")
-	return AlertHandler(ev.Name, topicname, "xdr")
-}
-
-func DpiHandle(ev *fsnotify.FileEvent) error {
 	defer func() {
-		if err := recover(); err != nil {
+		err := recover()
+		dealFileByErr_idsAlert(err.(error), ev.Name)
+		if err != nil {
 			mlog.Error(err)
 		}
 	}()
+	return AlertHandler(ev.Name, IdsAlertTopic, "xdr")
+}
+
+func VdsAlertHandler(ev *fsnotify.FileEvent) error {
+	defer func() {
+		err := recover()
+		dealFileByErr_vdsAlert(err.(error), ev.Name)
+		if err != nil {
+			mlog.Error(err)
+		}
+	}()
+	return AlertHandler(ev.Name, VdsAlertTopic, "xdr")
+}
+
+func DpiHandle(ev *fsnotify.FileEvent) error {
 	var filename = ev.Name
-	mlog.Alert("time1=", time.Now().Unix())
+	defer func() {
+		err := recover()
+		dealFileByErr_dpi(err.(error), filename)
+		if err != nil {
+			mlog.Error(err)
+		}
+	}()
+
 	mlog.Debug(fmt.Println("Create file:", filename))
 
 	//check file suffix
 	if ok := CheckSuffix(filename, []string{"xdr", "XDR"}...); !ok {
-		panic(fmt.Sprintf("file: %s suffix error!", filename))
+		mlog.Error("file: %s suffix error!", filename)
+		panic(ErrSuffixErr)
 	}
 
 	//read file
 	content, err := ReadFile(filename)
 	if err != nil {
-		panic(fmt.Sprintf("read file %s error:%s", filename, err.Error()))
+		mlog.Error("read file %s error:%s", filename, err.Error())
+		panic(ErrReadFileErr)
 	}
-	mlog.Alert("time2=", time.Now().Unix())
+
 	//XDR==>pre object
 	datalist, err := xdrParse.ParseXdr(content)
 	if err != nil {
-		panic(fmt.Sprintf("parse file %s Xdr error:%s", filename, err.Error()))
+		mlog.Error("parse file %s Xdr error:%s", filename, err.Error())
+		panic(ErrXdrParseErr)
 	}
-	mlog.Alert("time3=", time.Now().Unix())
-	//file to ceph
-	count, _ := dealForeachXdrs(datalist)
-	mlog.Debug("file", filename, "has xdr", count)
+
+	//deal objects foreach
+	count, success := dealForeachXdrs(datalist)
+	if success < count {
+		mlog.Error("file push kafka error")
+		mlog.Error("file:", filename, "count=", count, "success=", success)
+		panic(ErrPushKafkaErr)
+	}
 	return nil
 }
 
-func dealForeachXdrs(xdrs []*xdrParse.DpiXdr) (int, error) {
-	var count = 0
+func deleteFileSwitch(filename string, reserv bool, dir string) error {
+	if reserv {
+		if dir != "" {
+			RenameFile(filename, dir)
+		}
+		return nil
+	} else {
+		DeleteFile(filename)
+	}
+	return nil
+}
+
+/*
+ * 逐条处理，1.转换成backend 2.入kafka，
+ */
+func dealForeachXdrs(xdrs []*xdrParse.DpiXdr) (count int, success int) {
+	var success1 = 0
+	var fail1 = 0
+	count = 0
+	stops := make(chan error, len(xdrs))
+	realsize := 0
 	for _, xdr := range xdrs {
+		count++
 		//check type
 		xtype := xdr.CheckType()
 		switch xtype {
 		case xdrParse.XdrType:
-			dealXdrCommon(xdr)
+			if err := dealXdrCommon(xdr); err != nil {
+				fail1++
+				break
+			}
+			success1++
 		case xdrParse.XdrHttpType:
-			go dealHttpFileXdr(xdr)
+			go dealHttpFileXdr(xdr, stops)
+			realsize++
 		case xdrParse.XdrFileType:
-			go dealHttpFileXdr(xdr)
+			go dealHttpFileXdr(xdr, stops)
+			realsize++
 		default:
 			mlog.Error("CheckType error! return ", xtype)
 		}
-		count++
 	}
-	return count, nil
+	var success2 = 0
+	var fail2 = 0
+	for i := 0; i < realsize; i++ {
+		if err := <-stops; err != nil {
+			fail2++
+		} else {
+			success2++
+		}
+	}
+	success = success1 + success2
+	return
 }
 
 /*
  * deal xdr which is http or file,need save to ceph
  */
-func dealHttpFileXdr(xdr *xdrParse.DpiXdr) error {
+func dealHttpFileXdr(xdr *xdrParse.DpiXdr, stop chan error) error {
 	//1.save to ceph
 	if err := saveToCephPerXdr(xdr); err != nil {
+		stop <- err
 		return err
 	}
 	//2.pre obj --> backend obj
@@ -90,8 +147,10 @@ func dealHttpFileXdr(xdr *xdrParse.DpiXdr) error {
 
 	//3.push to kafka
 	if err := DoPushTopic(backend); err != nil {
+		stop <- err
 		return err
 	}
+	stop <- nil
 	return nil
 }
 
@@ -111,13 +170,7 @@ func dealXdrCommon(xdr *xdrParse.DpiXdr) error {
 }
 
 func AlertHandler(fileName string, topicName string, suffix string) error {
-	defer func() {
-		if err := recover(); err != nil {
-			mlog.Error(err)
-		}
-	}()
 	mlog.Debug(fmt.Println("Create file:", fileName))
-	mlog.Alert("time1=", time.Now())
 	//check file suffix
 	if ok := CheckSuffix(fileName, suffix); !ok {
 		panic(fmt.Sprintf("file: %s suffix error!", fileName))
@@ -174,5 +227,34 @@ func DoPushTopic(backObj *BackendInfo) error {
 		return err
 	}
 
+	return nil
+}
+
+func dealFileByErr_dpi(err error, filename string) error {
+	if err == nil {
+		deleteFileSwitch(filename, DoDelDpi, "")
+	} else {
+		if isXdrPkgErr(err) {
+			deleteFileSwitch(filename, DoDelIlegalDpi, DpiWatchDir+"/illegal/")
+		} else {
+			deleteFileSwitch(filename, true, DpiWatchDir+"/bak/")
+		}
+	}
+	return nil
+}
+func dealFileByErr_vdsAlert(err error, filename string) error {
+	if err == nil {
+		deleteFileSwitch(filename, DoDeleteVdsAlert, "")
+	} else {
+		deleteFileSwitch(filename, true, VdsAlertWatchDir+"/bak/")
+	}
+	return nil
+}
+func dealFileByErr_idsAlert(err error, filename string) error {
+	if err == nil {
+		deleteFileSwitch(filename, DoDeleteIdsAlert, "")
+	} else {
+		deleteFileSwitch(filename, true, IdsAlertWatchDir+"/bak/")
+	}
 	return nil
 }

@@ -39,14 +39,14 @@ func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 func main() {
 	var block chan int
 
-	dpiDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
-	go RunNotify(dpiDir, DpiHandle)
+	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
+	go RunNotify(DpiWatchDir, DpiHandle)
 
-	vdsAlertDir, _ := mconfig.Conf.String("dir", "VdsAlertDir")
-	go RunNotify(vdsAlertDir, VdsAlertHandler)
+	VdsAlertWatchDir, _ := mconfig.Conf.String("dir", "VdsAlertDir")
+	go RunNotify(VdsAlertWatchDir, VdsAlertHandler)
 
-	idsAlertDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")
-	go RunNotify(idsAlertDir, IdsAlertHandler)
+	IdsAlertWatchDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")
+	go RunNotify(IdsAlertWatchDir, IdsAlertHandler)
 
 	//begin waf-alert http server
 	RunWafServer()

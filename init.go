@@ -13,6 +13,26 @@ var TopicMap map[int]DataType
 
 var AgentNum int
 
+const (
+	XdrType = iota
+	XdrHttpType
+	XdrFileType
+)
+
+var DpiWatchDir string
+var VdsAlertWatchDir string
+var IdsAlertWatchDir string
+
+var DoDelDpi bool
+var DoDelIlegalDpi bool
+var DoDeleteVdsAlert bool
+var DoDelIlegalVdsAlert bool
+var DoDeleteIdsAlert bool
+var DoDelIlegalIdsAlert bool
+
+var IdsAlertTopic string
+var VdsAlertTopic string
+
 func init() {
 	//init log
 	mlog.SetLogger("file", `{"filename":"logs/server.log"}`)
@@ -24,6 +44,27 @@ func init() {
 
 	//init waf server
 	wafServInit()
+
+	//read config
+	initVariate()
+}
+func initVariate() {
+	var err error
+	GetConfBool(&DoDelDpi, "resvfile", "resvLegalDpi", false)
+	GetConfBool(&DoDelIlegalDpi, "resvfile", "resvIlegalDpi", true)
+	GetConfBool(&DoDeleteVdsAlert, "resvfile", "resvLegalAltVds", false)
+	GetConfBool(&DoDelIlegalVdsAlert, "resvfile", "resvIlegalAltVds", true)
+	GetConfBool(&DoDeleteIdsAlert, "resvfile", "resvLegalAltIds", false)
+	GetConfBool(&DoDelIlegalIdsAlert, "resvfile", "resvIlegalAltIds", true)
+
+	IdsAlertTopic, err = mconfig.Conf.String("kafka", "IdsAlertTopicName")
+	if err != nil {
+		panic("[kafka]IdsAlertTopicName not config")
+	}
+	VdsAlertTopic, err = mconfig.Conf.String("kafka", "VdsAlertTopicName")
+	if err != nil {
+		panic("[kafka]VdsAlertTopicName not config")
+	}
 }
 
 func topicInit() {
@@ -46,9 +87,3 @@ func topicInit() {
 		handlePre: XdrFilePreHandle,
 	}
 }
-
-const (
-	XdrType = iota
-	XdrHttpType
-	XdrFileType
-)

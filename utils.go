@@ -5,10 +5,12 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/binary"
+	"errors"
 	"io"
 	"net"
 	"os"
 	"path"
+	"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
 	"strings"
 )
@@ -83,4 +85,48 @@ func DealFilePerline(fileName string, handler func(string) error) (int, error) {
 		}
 	}
 	return n, nil
+}
+
+func DeleteFile(fileName string) error {
+	if err := os.Remove(fileName); err != nil {
+		mlog.Error("remove file", fileName, "err:", err.Error())
+		return err
+	}
+	mlog.Debug("remove file", fileName, "success")
+	return nil
+}
+
+/**
+ * oldFile is dir+file, newPath is dir only
+ */
+func RenameFile(oldFile string, newPath string) error {
+	file := path.Base(oldFile)
+	return os.Rename(oldFile, newPath+"/"+file)
+}
+
+func GetConfBool(result *bool, section string, option string, def bool) error {
+	str, err := mconfig.Conf.String(section, option)
+	if err != nil {
+		*result = def
+		return errors.New(section + option + " not configure")
+	}
+	switch str {
+	case "true":
+		*result = true
+	case "false":
+		*result = false
+	default:
+		*result = def
+	}
+	return nil
+}
+
+func StringToBool(tof string) (bool, error) {
+	if tof == "true" {
+		return true, nil
+	} else if tof == "false" {
+		return false, nil
+	} else {
+		return false, errors.New("parament error")
+	}
 }
