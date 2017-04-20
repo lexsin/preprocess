@@ -467,17 +467,17 @@ func parsDnsRspDelay(xdr *TlvValue, obj *DpiXdr) error {
 	return nil
 }
 
-func parsHttpRespInfo(xdr *TlvValue, obj *DpiXdr) error {
+func parsHttpReqInfo(xdr *TlvValue, obj *DpiXdr) error {
 	//201
-	//Debug("obj.HttpRespInfo=", string(xdr.Data))
-	obj.HttpRespInfo = xdr.Data
+	//Debug("obj.HttpReqInfo=", string(xdr.Data))
+	obj.HttpReqInfo = xdr.Data
 	return nil
 }
 
-func parsHttpReqInfo(xdr *TlvValue, obj *DpiXdr) error {
+func parsHttpRespInfo(xdr *TlvValue, obj *DpiXdr) error {
 	//202
-	//Debug("obj.HttpReqInfo=", string(xdr.Data))
-	obj.HttpReqInfo = xdr.Data
+	//Debug("obj.HttpRespInfo=", string(xdr.Data))
+	obj.HttpRespInfo = xdr.Data
 	return nil
 }
 

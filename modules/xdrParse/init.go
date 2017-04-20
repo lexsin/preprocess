@@ -83,7 +83,7 @@ func initFuncMap() {
 	DecodeFuncMap[XDR_DNS_AUTH_CNTT_CNT] = parsDNSAuthCnttCnt
 	DecodeFuncMap[XDR_DNS_EXTRA_RECORD_CNT] = parsDnsExtraRecordCnt
 	DecodeFuncMap[XDR_DNS_RSP_DELAY] = parsDnsRspDelay
-	DecodeFuncMap[XDR_HTTP_REQ_INFO] = parsHttpRespInfo
-	DecodeFuncMap[XDR_HTTP_RESP_INFO] = parsHttpReqInfo
+	DecodeFuncMap[XDR_HTTP_REQ_INFO] = parsHttpReqInfo
+	DecodeFuncMap[XDR_HTTP_RESP_INFO] = parsHttpRespInfo
 	DecodeFuncMap[XDR_FILE_CONTENT] = parsFileContent
 }
