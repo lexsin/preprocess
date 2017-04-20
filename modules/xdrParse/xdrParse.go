@@ -75,9 +75,9 @@ func ParseXdr(origiData []byte) ([]*DpiXdr, error) {
 			panic(ErrXdrParsScdFloorErr)
 			//return nil, err
 		}
-		//mlog.Debug("xdrs=", xdrs)
 		obj := rangeParseXdr(xdrs)
 		results = append(results, obj)
+		//mlog.Debug("obj.FileContent=", string(obj.FileContent))
 	}
 	return results, nil
 }
