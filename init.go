@@ -32,6 +32,7 @@ var DoDelIlegalIdsAlert bool
 
 var IdsAlertTopic string
 var VdsAlertTopic string
+var WafAlertTopic string
 
 func init() {
 	//init log
@@ -65,6 +66,11 @@ func initVariate() {
 	VdsAlertTopic, err = mconfig.Conf.String("kafka", "VdsAlertTopicName")
 	if err != nil {
 		mlog.Error("[kafka]VdsAlertTopicName not config")
+		panic(ErrNotConfErr)
+	}
+	WafAlertTopic, err = mconfig.Conf.String("kafka", "WafAlertTopicName")
+	if err != nil {
+		mlog.Error("[kafka]WafAlertTopicName not config")
 		panic(ErrNotConfErr)
 	}
 }

@@ -49,7 +49,7 @@ func main() {
 	go RunNotify(IdsAlertWatchDir, IdsAlertHandler)
 
 	//begin waf-alert http server
-	RunWafServer()
+	go RunWafServer()
 
 	//block
 	<-block

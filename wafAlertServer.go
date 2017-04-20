@@ -28,7 +28,9 @@ func RunWafServer() {
 	port, _ := mconfig.Conf.String("server", "HttpPort")
 	addr := ":" + port
 	mlog.Debug("http listen on ", port, "...")
-	http.ListenAndServe(addr, routerA)
+	if err := http.ListenAndServe(addr, routerA); err != nil {
+		panic("http listenAndServe " + addr + " error!")
+	}
 	return
 }
 
@@ -42,9 +44,8 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	//TODO parse json
 
 	//push kafka
-	topicname, _ := mconfig.Conf.String("kafka", "WafAlertTopicName")
 	data := &DataType{
-		topicName: topicname,
+		topicName: WafAlertTopic,
 		handlePre: func(data []byte) ([]byte, error) {
 			return data, nil
 		},
