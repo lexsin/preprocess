@@ -35,7 +35,7 @@ func RunWafServer() {
 }
 
 type WafAlert struct {
-	Client    string   `json:"client"`
+	Client    string   `json:"Client"`
 	Rev       string   `json:"Rev"`
 	Msg       string   `json:"Msg"`
 	Severity  string   `json:"Severity"`
