@@ -6,7 +6,7 @@ log_path=/tmp/DPI/log
 temp_path=/tmp/DPI
 
 function main() {
-/usr/local/bin/inotifywait -mrq --timefmt '%d-%m-%y-%H:%M:%S' --format '%T %w %f' -e create,moved_to $src_path | while read  time dir file event
+/usr/local/bin/inotifywait -mrq --timefmt '%d-%m-%y-%H:%M:%S' --format '%T %w %f' -e close,moved_to $src_path | while read  time dir file event
 do
 	echo $time'_'$dir'_'$file >> $log_path/decompressed.log 
 	

@@ -34,6 +34,13 @@ func RunWafServer() {
 	return
 }
 
+type WafAlertObj struct {
+	Data []struct {
+		BackendObj
+		Alert string
+	}
+}
+
 func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	r.ParseForm()
 	content, _ := ioutil.ReadAll(r.Body)
@@ -42,6 +49,15 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	//check form
 	//TODO parse json
+	var wafAlert WafAlertObj
+	result, _ := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	if err := json.Unmarshal([]byte(result), &wafAlert); err != nil {
+		mlog.Error("waf alert form err!")
+		Write(w, ErrOkErr, 10000)
+		return
+	}
+	mlog.Debug("waf alert Alert=", wafAlert.Data[len(wafAlert.Data)-1].Alert)
 
 	//push kafka
 	data := &DataType{
@@ -59,6 +75,7 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	//response
 	mlog.Debug("waf alert push kafka success!")
 	Write(w, ErrOkErr, 10000)
+	return
 }
 
 var ErrOkErr = errors.New("success")

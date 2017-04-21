@@ -179,8 +179,10 @@ type BackendObj struct {
 		Proto     uint64 `json:Proto`
 		File      string `json:File`
 	} `json:App`
-	Alert struct {
-	} `json:"-"`
+	/*
+		Alert struct {
+		} `json:"-"`
+	*/
 }
 
 func PerTransToBackendObj(src *xdrParse.DpiXdr) *BackendInfo {
