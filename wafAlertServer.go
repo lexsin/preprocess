@@ -71,19 +71,24 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 		Write(w, ErrOkErr, 10000)
 		return
 	}
-	mlog.Debug("waf alert Alert=", wafAlert.Data[len(wafAlert.Data)-1].Alert)
 
-	//push kafka
-	data := &DataType{
-		topicName: WafAlertTopic,
-		handlePre: func(data []byte) ([]byte, error) {
-			return data, nil
-		},
-		origiData: content,
-		partition: 0,
-	}
-	if err := pushkafka.PushKafka(data); err != nil {
-		mlog.Error("waf push kafka error:", err.Error())
+	for _, alert := range wafAlert.Data {
+		altJson, err := json.Marshal(alert)
+		if err != nil {
+			continue
+		}
+		//push kafka
+		data := &DataType{
+			topicName: WafAlertTopic,
+			handlePre: func(data []byte) ([]byte, error) {
+				return data, nil
+			},
+			origiData: altJson,
+			partition: 0,
+		}
+		if err := pushkafka.PushKafka(data); err != nil {
+			mlog.Error("waf push kafka error:", err.Error())
+		}
 	}
 
 	//response
