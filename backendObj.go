@@ -170,7 +170,7 @@ type BackendObj struct {
 		Type uint64 `json:Type`
 	} `json:Proxy`
 	QQ struct {
-		Number uint64 `json:Number`
+		Number string `json:Number`
 	} `json:QQ`
 	App struct {
 		ProtoInfo uint64 `json:ProtoInfo`
