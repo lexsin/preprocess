@@ -34,10 +34,26 @@ func RunWafServer() {
 	return
 }
 
+type WafAlert struct {
+	Client    string   `json:"client"`
+	Rev       string   `json:"Rev"`
+	Msg       string   `json:"Msg"`
+	Severity  string   `json:"Severity"`
+	Maturity  string   `json:"Maturityc"`
+	Accuracy  string   `json:"Accuracy"`
+	Ref       string   `json:"Ref"`
+	Hostname  string   `json:"Hostname"`
+	Uri       string   `json:"Uri"`
+	Unique_id string   `json:"Unique_id"`
+	Tag       []string `json:"Tag"`
+	Rule      []string `json:"Rule"`
+	Version   string   `json:"Version"`
+}
+
 type WafAlertObj struct {
 	Data []struct {
 		BackendObj
-		Alert string
+		Alert WafAlert `json:"Alert"`
 	}
 }
 
@@ -50,9 +66,7 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	//check form
 	//TODO parse json
 	var wafAlert WafAlertObj
-	result, _ := ioutil.ReadAll(r.Body)
-	r.Body.Close()
-	if err := json.Unmarshal([]byte(result), &wafAlert); err != nil {
+	if err := json.Unmarshal([]byte(content), &wafAlert); err != nil {
 		mlog.Error("waf alert form err!")
 		Write(w, ErrOkErr, 10000)
 		return
