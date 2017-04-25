@@ -35,19 +35,27 @@ func RunWafServer() {
 }
 
 type WafAlert struct {
-	Client    string   `json:"Client"`
-	Rev       string   `json:"Rev"`
-	Msg       string   `json:"Msg"`
-	Severity  string   `json:"Severity"`
-	Maturity  string   `json:"Maturityc"`
-	Accuracy  string   `json:"Accuracy"`
-	Ref       string   `json:"Ref"`
-	Hostname  string   `json:"Hostname"`
-	Uri       string   `json:"Uri"`
-	Unique_id string   `json:"Unique_id"`
-	Tag       []string `json:"Tag"`
-	Rule      []string `json:"Rule"`
-	Version   string   `json:"Version"`
+	Client    string       `json:"Client"`
+	Rev       string       `json:"Rev"`
+	Msg       string       `json:"Msg"`
+	Severity  int32        `json:"Severity"`
+	Maturity  int32        `json:"Maturityc"`
+	Accuracy  int32        `json:"Accuracy"`
+	Hostname  string       `json:"Hostname"`
+	Uri       string       `json:"Uri"`
+	Unique_id string       `json:"Unique_id"`
+	Ref       string       `json:"Ref"`
+	Tags      []string     `json:"Tags"`
+	Rule      WafAlertRule `json:"Rule"`
+	Version   string       `json:"Version"`
+}
+
+type WafAlertRule struct {
+	File string `json:"File"`
+	Line uint64 `json:"Line"`
+	Id   uint64 `json:"Id"`
+	Data string `json:"Data"`
+	Ver  string `json:"Ver"`
 }
 
 type WafAlertObj struct {

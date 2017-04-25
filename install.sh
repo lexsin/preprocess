@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#mkdir 
 #mv source to go src
 #go get package
 #go build
@@ -7,11 +8,16 @@
 #./watchdir.sh
 
 main() {
-			
+	$(create_dir)	
 	$(go_get_package)
 	go build
 	nohup ./preprocess &
 	./watchdir.sh &
+}
+
+create_dir() {
+	mkdir -p /home/ftp/DPI
+	mkdir -p /home
 }
 
 go_get_package() {
