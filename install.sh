@@ -7,6 +7,7 @@
 #./preprocess
 #./watchdir.sh
 
+
 main() {
 	$(create_dir)	
 	$(go_get_package)
@@ -27,9 +28,9 @@ go_get_package() {
 }
 
 check_key() {
-	kv = $1
-	stand_key = $2
-	key = `echo "${kv}" | cut -d \= -f 1`
+	local kv = $1
+	local stand_key = $2
+	local key = `echo "${kv}" | cut -d \= -f 1`
 	if [[ "${stand_key}" != "${key}" ]];then
 		return false
 		
@@ -37,8 +38,8 @@ check_key() {
 }
 
 get_value() {
-	kv = $1	
-	key = $2
+	local kv = $1	
+	local key = $2
 	if [ ! $(check_key "${kv}" "${stand_key}") ];then
 		return 1	
 	fi

@@ -130,3 +130,22 @@ func StringToBool(tof string) (bool, error) {
 		return false, errors.New("parament error")
 	}
 }
+
+func CreateDir(dir string) error {
+	if absolute := path.IsAbs(dir); !absolute {
+		mlog.Error(dir, "is not absolute")
+		return nil
+	}
+	_, err := os.Stat(dir)
+	if err == nil {
+		return nil
+	} else {
+		if os.IsNotExist(err) {
+			if err := os.MkdirAll(dir, 0777); err != nil {
+				mlog.Error("create path ", dir, "err:", err.Error())
+				return err
+			}
+		}
+	}
+	return err
+}
