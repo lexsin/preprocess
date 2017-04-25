@@ -59,10 +59,8 @@ type WafAlertRule struct {
 }
 
 type WafAlertObj struct {
-	Data []struct {
-		BackendObj
-		Alert WafAlert `json:"Alert"`
-	}
+	BackendObj
+	Alert WafAlert `json:"Alert"`
 }
 
 func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -73,14 +71,14 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 
 	//check form
 	//TODO parse json
-	var wafAlert WafAlertObj
+	var wafAlert []WafAlertObj
 	if err := json.Unmarshal([]byte(content), &wafAlert); err != nil {
 		mlog.Error("waf alert form err!")
 		Write(w, ErrOkErr, 10000)
 		return
 	}
 
-	for _, alert := range wafAlert.Data {
+	for _, alert := range wafAlert {
 		altJson, err := json.Marshal(alert)
 		if err != nil {
 			continue
