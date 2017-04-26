@@ -4,7 +4,8 @@ src_path=/mnt/ftp/DPI
 dst_path=/mnt/DPI/XDR
 log_path=/tmp/DPI/log
 temp_path=/tmp/DPI
-#log_file=$log_path/decompressed.log
+log_file=$log_path/decompressed.log
+
 
 create_dir() {
 	if [ ! -d "${src_path}" ]; then 
