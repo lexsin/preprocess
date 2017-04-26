@@ -21,7 +21,7 @@ main() {
 	$(go_get_package)
 	go build
 	nohup ./preprocess &
-	./watchdir.sh &
+	./preWatchdir.sh &
 }
 
 create_dir() {
