@@ -8,11 +8,11 @@
 #./watchdir.sh
 
 RealRootDir="/root"
-LnsRootDir="/mnt/"
-DpiZ4Dir="${RealRootDir}ftp/Dpi"
-DpiXdrDir="${RealRootDir}Dpi/xdr"
-IdsAlertDir="${RealRootDir}ftp/alert/ids"
-VdsAlertDir="${RealRootDir}ftp/alert/vds"
+LnsRootDir="/mnt"
+DpiZ4Dir="${RealRootDir}/ftp/Dpi"
+DpiXdrDir="${RealRootDir}/Dpi/xdr"
+IdsAlertDir="${RealRootDir}/ftp/alert/ids"
+VdsAlertDir="${RealRootDir}/ftp/alert/vds"
 temp_path="/tmp/DPI"
 
 
