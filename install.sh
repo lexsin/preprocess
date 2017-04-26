@@ -7,6 +7,14 @@
 #./preprocess
 #./watchdir.sh
 
+RealRootDir="/root"
+LnsRootDir="/mnt/"
+DpiZ4Dir="${RealRootDir}ftp/Dpi"
+DpiXdrDir="${RealRootDir}Dpi/xdr"
+IdsAlertDir="${RealRootDir}ftp/alert/ids"
+VdsAlertDir="${RealRootDir}ftp/alert/vds"
+temp_path="/tmp/DPI"
+
 
 main() {
 	$(create_dir)	
@@ -17,8 +25,13 @@ main() {
 }
 
 create_dir() {
-	mkdir -p /home/ftp/DPI
-	mkdir -p /home
+	mkdir -p  ${DpiZ4Dir}
+	mkdir -p  ${DpiXdrDir}
+	mkdir -p  ${IdsAlertDir}
+	mkdir -p  ${VdsAlertDir}
+	mkdir -p  ${temp_path}
+	ln -s "${RealRootDir}ftp" "${LnsRootDir}ftp"
+	ln -s "${RealRootDir}Dpi" "${LnsRootDir}Dpi"
 }
 
 go_get_package() {
