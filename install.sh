@@ -30,8 +30,8 @@ create_dir() {
 	mkdir -p  ${IdsAlertDir}
 	mkdir -p  ${VdsAlertDir}
 	mkdir -p  ${temp_path}
-	ln -s "${RealRootDir}ftp" "${LnsRootDir}ftp"
-	ln -s "${RealRootDir}Dpi" "${LnsRootDir}Dpi"
+	ln -s "${RealRootDir}/ftp" "${LnsRootDir}/ftp"
+	ln -s "${RealRootDir}/Dpi" "${LnsRootDir}/Dpi"
 }
 
 go_get_package() {
