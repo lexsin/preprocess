@@ -38,6 +38,8 @@ go_get_package() {
 	go get github.com/howeyc/fsnotify
 	go get github.com/astaxie/beego
 	go get github.com/optiopay/kafka
+	go get github.com/julienschmidt/httprouter
+	go get github.com/larspensjo/config
 }
 
 check_key() {
