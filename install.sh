@@ -14,6 +14,7 @@ DpiXdrDir="${RealRootDir}/Dpi/xdr"
 IdsAlertDir="${RealRootDir}/ftp/alert/ids"
 VdsAlertDir="${RealRootDir}/ftp/alert/vds"
 temp_path="/tmp/DPI"
+watchlog="/tmp/DPI/log"
 
 
 main() {
@@ -30,6 +31,7 @@ create_dir() {
 	mkdir -p  ${IdsAlertDir}
 	mkdir -p  ${VdsAlertDir}
 	mkdir -p  ${temp_path}
+	mkdir -p  ${watchlog}
 	ln -s "${RealRootDir}/ftp" "${LnsRootDir}/ftp"
 	ln -s "${RealRootDir}/Dpi" "${LnsRootDir}/Dpi"
 }

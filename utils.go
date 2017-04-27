@@ -60,7 +60,7 @@ func Md5Sum(data []byte) []byte {
 	return sum[:]
 }
 
-func DealFilePerline(fileName string, handler func(string) error) (int, error) {
+func DealFilePerline(fileName string, handlers perAlertFuncs) (int, error) {
 	var n = 0
 	f, err := os.Open(fileName)
 	if err != nil {
@@ -76,7 +76,11 @@ func DealFilePerline(fileName string, handler func(string) error) (int, error) {
 			return n, err
 		}
 		line = strings.TrimSpace(line)
-		if err := handler(line); err != nil {
+		if err := handlers.checkForm(line); err != nil {
+			mlog.Error(fileName, "form error!")
+			return n, err
+		}
+		if err := handlers.pushkafka(line); err != nil {
 			mlog.Error("line:", line, "handler error:", err.Error())
 		}
 		n++

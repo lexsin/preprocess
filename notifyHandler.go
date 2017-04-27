@@ -22,7 +22,16 @@ func IdsAlertHandler(ev *fsnotify.FileEvent) error {
 			mlog.Error(err)
 		}
 	}()
-	return AlertHandler(ev.Name, IdsAlertTopic, "xdr")
+
+	checkForm := func(line string) error {
+		alert := IdsAlert{}
+		if err := json.Unmarshal([]byte(line), &alert); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return AlertHandler(ev.Name, IdsAlertTopic, "xdr", checkForm)
 }
 
 func VdsAlertHandler(ev *fsnotify.FileEvent) error {
@@ -33,7 +42,16 @@ func VdsAlertHandler(ev *fsnotify.FileEvent) error {
 			mlog.Error(err)
 		}
 	}()
-	return AlertHandler(ev.Name, VdsAlertTopic, "xdr")
+
+	checkForm := func(line string) error {
+		alert := VdsFullAlert{}
+		if err := json.Unmarshal([]byte(line), &alert); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return AlertHandler(ev.Name, VdsAlertTopic, "xdr", checkForm)
 }
 
 func DpiHandle(ev *fsnotify.FileEvent) error {
@@ -170,7 +188,12 @@ func dealXdrCommon(xdr *xdrParse.DpiXdr) error {
 	return nil
 }
 
-func AlertHandler(fileName string, topicName string, suffix string) error {
+type perAlertFuncs struct {
+	pushkafka func(line string) error
+	checkForm func(line string) error
+}
+
+func AlertHandler(fileName string, topicName string, suffix string, checkForm func(line string) error) error {
 	mlog.Debug(fmt.Println("Create file:", fileName))
 	//check file suffix
 	if ok := CheckSuffix(fileName, suffix); !ok {
@@ -179,7 +202,6 @@ func AlertHandler(fileName string, topicName string, suffix string) error {
 	}
 
 	//push kafka
-
 	pushkafkaFunc := func(line string) error {
 		data := &DataType{
 			topicName: topicName,
@@ -194,8 +216,15 @@ func AlertHandler(fileName string, topicName string, suffix string) error {
 		}
 		return nil
 	}
+
 	//read file
-	DealFilePerline(fileName, pushkafkaFunc)
+	inter := perAlertFuncs{
+		pushkafka: pushkafkaFunc,
+		checkForm: checkForm,
+	}
+	if _, err := DealFilePerline(fileName, inter); err != nil {
+		return err
+	}
 	return nil
 }
 
