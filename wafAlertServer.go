@@ -38,6 +38,7 @@ type WafAlert struct {
 	Client    string       `json:"Client"`
 	Rev       string       `json:"Rev"`
 	Msg       string       `json:"Msg"`
+	Attack    string       `json:"Attack"`
 	Severity  int32        `json:"Severity"`
 	Maturity  int32        `json:"Maturityc"`
 	Accuracy  int32        `json:"Accuracy"`
