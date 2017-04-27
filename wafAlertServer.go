@@ -75,7 +75,12 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	var wafAlert []WafAlertObj
 	if err := json.Unmarshal([]byte(content), &wafAlert); err != nil {
 		mlog.Error("waf alert form err!")
-		Write(w, ErrOkErr, 10000)
+		Write(w, ErrFormErr, 10001)
+		return
+	}
+	if len(wafAlert) == 0 {
+		mlog.Error("waf alert is nil!")
+		Write(w, ErrFormErr, 10001)
 		return
 	}
 
@@ -105,6 +110,7 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 }
 
 var ErrOkErr = errors.New("success")
+var ErrFormErr = errors.New("form error")
 
 func Write(w http.ResponseWriter, err error, code int) {
 	rsp := RespData{
