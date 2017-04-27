@@ -371,35 +371,12 @@ func (this *BackendObj) CheckType() int {
 }
 */
 func (this *BackendObj) HashPartation() uint32 {
-	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.LittleEndian, this.Conn.Dport)
-	binary.Write(buf, binary.LittleEndian, this.Conn.Sport)
-	binary.Write(buf, binary.LittleEndian, this.Conn.Proto)
-	binary.Write(buf, binary.LittleEndian, this.Conn.Sip)
-	binary.Write(buf, binary.LittleEndian, this.Conn.Dip)
-
-	buftemp := new(bytes.Buffer)
-	bufbyt := buf.Bytes()
-	var sum uint32
-	var end int
-	length := len(bufbyt)
-	for i := 0; i < length; i = i + 4 {
-		end = i + 4
-		if end > length {
-			end = length
-		}
-		if i == length-1 {
-			break
-		}
-		var n uint32
-		buftemp.Reset()
-		buftemp.Write(bufbyt[i:end])
-		if err := binary.Read(buftemp, binary.LittleEndian, &n); err != nil {
-			mlog.Error("HashPartation err:", err.Error())
-			return 0
-		}
-		sum += n
-	}
+	//init topic partition
+	sum := Ipv4StringToInt(this.Conn.Sip) +
+		Ipv4StringToInt(this.Conn.Dip) +
+		uint32(this.Conn.Dport) +
+		uint32(this.Conn.Sport) +
+		uint32(this.Conn.Proto)
 
 	return uint32(uint32(sum) % uint32(PartitionNum))
 }
