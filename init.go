@@ -34,6 +34,8 @@ var IdsAlertTopic string
 var VdsAlertTopic string
 var WafAlertTopic string
 
+var PartitionNum int
+
 func init() {
 	//init log
 	mlog.SetLogger("file", `{"filename":"logs/server.log"}`)
@@ -71,6 +73,12 @@ func initVariate() {
 	WafAlertTopic, err = mconfig.Conf.String("kafka", "WafAlertTopicName")
 	if err != nil {
 		mlog.Error("[kafka]WafAlertTopicName not config")
+		panic(ErrNotConfErr)
+	}
+
+	PartitionNum, err = mconfig.Conf.Int("kafka", "AgentNum")
+	if err != nil {
+		mlog.Error("[kafka]AgentNum not config")
 		panic(ErrNotConfErr)
 	}
 }

@@ -7,7 +7,7 @@
 #./preprocess
 #./watchdir.sh
 
-RealRootDir="/root"
+RealRootDir="/home"
 LnsRootDir="/mnt"
 DpiZ4Dir="${RealRootDir}/ftp/Dpi"
 DpiXdrDir="${RealRootDir}/Dpi/xdr"
