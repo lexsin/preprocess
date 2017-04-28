@@ -43,13 +43,15 @@ func moduleInit() {
 	conf.AllowTopicCreation = true
 	// connect to kafka cluster
 	var err error
-	host, err := mconfig.Conf.Int("kafka", "KafkaHost")
+	host, err := mconfig.Conf.String("kafka", "KafkaHost")
 	if err != nil {
 		mlog.Error("[kafka]KafkaHost not configure")
 		panic(ErrNotConfigErr)
 	}
 	addr1 := fmt.Sprintf("%s:9092", host)
 	addr2 := fmt.Sprintf("%s:9093", host)
+	mlog.Debug("kafka addr1=", addr1)
+	mlog.Debug("kafka addr2=", addr2)
 	kafkaAddrs = make([]string, 0)
 	kafkaAddrs = append(kafkaAddrs, addr1)
 	kafkaAddrs = append(kafkaAddrs, addr2)
