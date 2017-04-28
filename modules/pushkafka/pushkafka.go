@@ -11,11 +11,6 @@ import (
 	"github.com/optiopay/kafka/proto"
 )
 
-var kafkaAddrs = []string{"10.80.6.9:9092", "10.80.6.9:9093"}
-var Broker *kafka.Broker
-var WriterMap map[string]chan dataInfo
-var waitTimeOut = 600 * time.Second
-
 type PushKafkaer interface {
 	TopicName() string
 	Partition() int
