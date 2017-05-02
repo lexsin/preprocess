@@ -1,8 +1,8 @@
 package main
 
 import (
-	//"bytes"
-	//"encoding/binary"
+	"bytes"
+	"encoding/binary"
 	//"preprocess/modules/mlog"
 	"preprocess/modules/xdrParse"
 )
@@ -371,12 +371,29 @@ func (this *BackendObj) CheckType() int {
 }
 */
 func (this *BackendObj) HashPartation() uint32 {
-	//init topic partition
-	sum := Ipv4StringToInt(this.Conn.Sip) +
-		Ipv4StringToInt(this.Conn.Dip) +
-		uint32(this.Conn.Dport) +
-		uint32(this.Conn.Sport) +
-		uint32(this.Conn.Proto)
-
+	var divisor uint32 = 3
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, []byte(this.Conn.Sip))
+	binary.Write(buf, binary.LittleEndian, []byte(this.Conn.Dip))
+	binary.Write(buf, binary.LittleEndian, this.Conn.Dport)
+	binary.Write(buf, binary.LittleEndian, this.Conn.Sport)
+	binary.Write(buf, binary.LittleEndian, this.Conn.Proto)
+	//bufbytes := buf.Bytes()
+	//mlog.Debug("bufbytes len=", len(bufbytes))
+	var n uint8
+	var sum uint32 = 0
+	length := buf.Len()
+	for i := 0; i < length; i++ {
+		binary.Read(buf, binary.LittleEndian, &n)
+		sum += uint32(n) * divisor
+	}
+	/*
+		//init topic partition
+		sum := Ipv4StringToInt(this.Conn.Sip) +
+			Ipv4StringToInt(this.Conn.Dip) +
+			uint32(this.Conn.Dport) +
+			uint32(this.Conn.Sport) +
+			uint32(this.Conn.Proto)
+	*/
 	return uint32(uint32(sum) % uint32(PartitionNum))
 }
