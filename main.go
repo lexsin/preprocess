@@ -7,6 +7,8 @@ import (
 	"github.com/howeyc/fsnotify"
 )
 
+type FileEvent *fsnotify.FileEvent
+
 func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 	Watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -24,9 +26,13 @@ func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
 	for {
 		select {
 		case ev := <-Watcher.Event:
-			if ev.IsCreate() {
-				go handle(ev)
-			}
+			mlog.Debug("event:", ev)
+			/*
+				case ev := <-Watcher.Event:
+					if ev.IsCreate() {
+						go handle(ev)
+					}
+			*/
 		case err := <-Watcher.Error:
 			mlog.Error(err)
 		}
