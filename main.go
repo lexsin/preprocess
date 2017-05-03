@@ -2,54 +2,26 @@ package main
 
 import (
 	"preprocess/modules/mconfig"
-	"preprocess/modules/mlog"
-
-	"github.com/howeyc/fsnotify"
+	//"preprocess/modules/mlog"
 )
-
-func RunNotify(dir string, handle func(ev *fsnotify.FileEvent) error) {
-	Watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		mlog.Error(err)
-		panic("fsnotify.NewWatcher() error:" + err.Error())
-	}
-
-	go func() {
-		err := Watcher.Watch(dir)
-		if err != nil {
-			mlog.Error(err)
-		}
-	}()
-	mlog.Info("begin watch dir:", dir)
-	for {
-		select {
-		case ev := <-Watcher.Event:
-			if ev.IsCreate() {
-				go handle(ev)
-			}
-		case err := <-Watcher.Error:
-			mlog.Error(err)
-		}
-	}
-
-	/* ... do stuff ... */
-	Watcher.Close()
-}
 
 func main() {
 	var block chan int
 
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	CreateDir(DpiWatchDir)
-	go RunNotify(DpiWatchDir, DpiHandle)
+	//go RunNotify(DpiWatchDir, DpiHandle)
+	go notify_ftp_mv(DpiWatchDir, DpiHandle)
 
 	VdsAlertWatchDir, _ := mconfig.Conf.String("dir", "VdsAlertDir")
 	CreateDir(VdsAlertWatchDir)
-	go RunNotify(VdsAlertWatchDir, VdsAlertHandler)
+	//go RunNotify(VdsAlertWatchDir, VdsAlertHandler)
+	go notify_ftp_mv(VdsAlertWatchDir, VdsAlertHandler)
 
 	IdsAlertWatchDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")
 	CreateDir(IdsAlertWatchDir)
-	go RunNotify(IdsAlertWatchDir, IdsAlertHandler)
+	//go RunNotify(IdsAlertWatchDir, IdsAlertHandler)
+	go notify_ftp_mv(IdsAlertWatchDir, IdsAlertHandler)
 
 	//begin waf-alert http server
 	RunWafServer()
