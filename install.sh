@@ -9,8 +9,8 @@
 
 RealRootDir="/home"
 LnsRootDir="/mnt"
-DpiZ4Dir="${RealRootDir}/ftp/Dpi"
-DpiXdrDir="${RealRootDir}/Dpi/xdr"
+DpiZ4Dir="${RealRootDir}/ftp/DPI"
+DpiXdrDir="${RealRootDir}/DPI/XDR"
 IdsAlertDir="${RealRootDir}/ftp/alert/ids"
 VdsAlertDir="${RealRootDir}/ftp/alert/vds"
 temp_path="/tmp/DPI"
@@ -33,7 +33,7 @@ create_dir() {
 	mkdir -p  ${temp_path}
 	mkdir -p  ${watchlog}
 	ln -s "${RealRootDir}/ftp" "${LnsRootDir}/ftp"
-	ln -s "${RealRootDir}/Dpi" "${LnsRootDir}/Dpi"
+	ln -s "${RealRootDir}/DPI" "${LnsRootDir}/DPI"
 }
 
 go_get_package() {

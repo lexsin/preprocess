@@ -5,19 +5,74 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	//"preprocess/modules/mconfig"
 	"preprocess/modules/mlog"
 	"preprocess/modules/pushkafka"
 	"preprocess/modules/xdrParse"
+
+	"github.com/rjeczalik/notify"
 	//"time"
 
 	"github.com/howeyc/fsnotify"
 )
 
-func IdsAlertHandler(ev *fsnotify.FileEvent) error {
+func Rjnotify_closewrite(dir string, handle func(filename string) error) {
+	var err error
+	var ei notify.EventInfo
+
+	c := make(chan notify.EventInfo, 1)
+	defer notify.Stop(c)
+
+	for {
+		if err = notify.Watch(dir, c, notify.InCloseWrite); err != nil {
+			panic(errors.New(fmt.Sprintln("notify watch dir", dir, err.Error())))
+		}
+
+		switch ei = <-c; ei.Event() {
+		case notify.InCloseWrite:
+			handle(filepath.Base(ei.Path()))
+		default:
+			mlog.Error(fmt.Println("notify get event:", ei))
+		}
+	}
+}
+
+func RunNotify(dir string, handle func(filename string) error) {
+	Watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		mlog.Error(err)
+		panic("fsnotify.NewWatcher() error:" + err.Error())
+	}
+	go func() {
+		err := Watcher.Watch(dir)
+		if err != nil {
+			mlog.Error(err)
+		}
+	}()
+	mlog.Info("begin watch dir:", dir)
+	for {
+		select {
+		case ev := <-Watcher.Event:
+			mlog.Debug("event:", ev)
+
+		case ev := <-Watcher.Event:
+			if ev.IsCreate() {
+				go handle(ev.Name)
+			}
+
+		case err := <-Watcher.Error:
+			mlog.Error(err)
+		}
+	}
+
+	/* ... do stuff ... */
+	Watcher.Close()
+}
+func IdsAlertHandler(filename string) error {
 	defer func() {
 		err := recover()
-		dealFileByErr_idsAlert(err, ev.Name)
+		dealFileByErr_idsAlert(err, filename)
 		if err != nil {
 			mlog.Error(err)
 		}
@@ -31,13 +86,13 @@ func IdsAlertHandler(ev *fsnotify.FileEvent) error {
 		return nil
 	}
 
-	return AlertHandler(ev.Name, IdsAlertTopic, "xdr", checkForm)
+	return AlertHandler(filename, IdsAlertTopic, "xdr", checkForm)
 }
 
-func VdsAlertHandler(ev *fsnotify.FileEvent) error {
+func VdsAlertHandler(filename string) error {
 	defer func() {
 		err := recover()
-		dealFileByErr_vdsAlert(err, ev.Name)
+		dealFileByErr_vdsAlert(err, filename)
 		if err != nil {
 			mlog.Error(err)
 		}
@@ -51,11 +106,10 @@ func VdsAlertHandler(ev *fsnotify.FileEvent) error {
 		return nil
 	}
 
-	return AlertHandler(ev.Name, VdsAlertTopic, "xdr", checkForm)
+	return AlertHandler(filename, VdsAlertTopic, "xdr", checkForm)
 }
 
-func DpiHandle(ev *fsnotify.FileEvent) error {
-	var filename = ev.Name
+func DpiHandle(filename string) error {
 	defer func() {
 		err := recover()
 		dealFileByErr_dpi(err, filename)
