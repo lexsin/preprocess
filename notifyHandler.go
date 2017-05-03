@@ -17,7 +17,7 @@ import (
 	"github.com/howeyc/fsnotify"
 )
 
-func Rjnotify_closewrite(dir string, handle func(filename string) error) {
+func notify_closewrite(dir string, handle func(filename string) error) {
 	var err error
 	var ei notify.EventInfo
 
