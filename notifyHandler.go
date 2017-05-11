@@ -323,6 +323,12 @@ func DoPushTopic(backObj *BackendInfo) error {
 }
 
 func dealFileByErr_dpi(errer interface{}, filename string) error {
+	defer func() {
+		err := recover()
+		if err != nil {
+			mlog.Error("dealFileByErr_dpi():", err)
+		}
+	}()
 	if errer == nil {
 		deleteFileSwitch(filename, DoDelDpi, "")
 	} else {
