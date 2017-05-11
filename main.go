@@ -10,12 +10,10 @@ func main() {
 
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	CreateDir(DpiWatchDir)
-	//go RunNotify(DpiWatchDir, DpiHandle)
 	go notify_ftp_mv(DpiWatchDir, DpiHandle)
 
 	VdsAlertWatchDir, _ := mconfig.Conf.String("dir", "VdsAlertDir")
 	CreateDir(VdsAlertWatchDir)
-	//go RunNotify(VdsAlertWatchDir, VdsAlertHandler)
 	go notify_ftp_mv(VdsAlertWatchDir, VdsAlertHandler)
 
 	IdsAlertWatchDir, _ := mconfig.Conf.String("dir", "IdsAlertDir")

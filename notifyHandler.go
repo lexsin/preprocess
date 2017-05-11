@@ -38,7 +38,7 @@ func notify_ftp_mv(dir string, handle func(filename string) error) {
 
 		switch ei = <-c; ei.Event() {
 		case notify.InCloseWrite, notify.InMovedTo:
-			handle(ei.Path())
+			go handle(ei.Path())
 		default:
 			mlog.Error(fmt.Println("notify get event:", ei))
 		}
