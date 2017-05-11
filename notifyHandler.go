@@ -20,6 +20,13 @@ func notify_ftp_mv(dir string, handle func(filename string) error) {
 	var err error
 	var ei notify.EventInfo
 
+	defer func() {
+		err := recover()
+		if err != nil {
+			mlog.Error("notify_ftp_mv():", err)
+		}
+	}()
+
 	c := make(chan notify.EventInfo, 1)
 	defer notify.Stop(c)
 	mlog.Info("begin watch dir:", dir)
