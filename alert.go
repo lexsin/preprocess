@@ -26,6 +26,7 @@ type IdsAlert struct {
 	Dest_ip     string `json:dest_ip`
 	Dest_port   uint32 `json:dest_port`
 	Proto       uint32 `json:proto`
+	Byzoro_type string `json:byzoro_type`
 	Attack_type string `json:attack_type`
 	Details     string `json:details`
 	Severity    uint32 `json:severity`
