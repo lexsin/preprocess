@@ -10,7 +10,7 @@ import (
 	"preprocess/modules/pushkafka"
 	"preprocess/modules/xdrParse"
 
-	"github.com/rjeczalik/notify"
+	//"github.com/rjeczalik/notify"
 	//"time"
 
 	"github.com/howeyc/fsnotify"
