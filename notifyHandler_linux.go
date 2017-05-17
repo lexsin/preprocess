@@ -1,8 +1,13 @@
+// +build linux
 package main
 
-import "github.com/rjeczalik/notify"
+import (
+	"fmt"
+	"preprocess/modules/mlog"
 
-// +build linux
+	"github.com/rjeczalik/notify"
+)
+
 func notify_ftp_mv(dir string, handle func(filename string) error) {
 	var err error
 	var ei notify.EventInfo
