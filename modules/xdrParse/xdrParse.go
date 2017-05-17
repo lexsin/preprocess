@@ -134,15 +134,12 @@ func RangeToObj(data []byte) ([]TlvValue, error) {
 			if len(temp) < int(tlvLength) {
 				return list, ErrXdrNotEnoughLenErr
 			}
-			if int(tlvLength) < headsize {
-				return list, ErrTlvLengthErr
-			}
 			value := TlvValue{
-				TlvId:     head.baseInfo.TlvId,
-				ShortData: head.baseInfo.ShortData,
-				IsExtend:  false,
-				DataLen:   uint32(tlvLength - uint32(headsize)),
-				Data:      temp[headsize:int(tlvLength)],
+				TlvId:       head.baseInfo.TlvId,
+				giShortData: head.baseInfo.ShortData,
+				IsExtend:    false,
+				DataLen:     uint32(tlvLength - uint32(headsize)),
+				Data:        temp[headsize:int(tlvLength)],
 			}
 			Debug("extend head TlvId=", head.baseInfo.TlvId, "TlvLength=", tlvLength)
 			list = append(list, value)
