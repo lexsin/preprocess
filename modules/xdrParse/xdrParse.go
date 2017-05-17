@@ -134,6 +134,9 @@ func RangeToObj(data []byte) ([]TlvValue, error) {
 			if len(temp) < int(tlvLength) {
 				return list, ErrXdrNotEnoughLenErr
 			}
+			if int(tlvLength) < headsize {
+				return list, ErrTlvLengthErr
+			}
 			value := TlvValue{
 				TlvId:     head.baseInfo.TlvId,
 				ShortData: head.baseInfo.ShortData,
