@@ -199,9 +199,11 @@ func (this *DpiXdr) CheckType() int {
 }
 
 var ErrXdrHeadErr error
+var ErrTlvLengthErr error
 var ErrXdrNotEnoughLenErr error
 
 func errInit() {
 	ErrXdrHeadErr = errors.New("head check error")
 	ErrXdrNotEnoughLenErr = errors.New("xdr data isn't enough long")
+	ErrTlvLengthErr = errors.New("tlv length error")
 }
