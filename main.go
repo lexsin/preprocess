@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	var block chan int
+	//var block chan int
 
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	CreateDir(DpiWatchDir)
@@ -22,8 +22,9 @@ func main() {
 	go notify_ftp_mv(IdsAlertWatchDir, IdsAlertHandler)
 
 	//begin waf-alert http server
-	RunWafServer()
+	go RunWafServer()
 
 	//block
-	<-block
+	//<-block
+	safeExit()
 }

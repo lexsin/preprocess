@@ -85,6 +85,7 @@ func wafAlertWatch(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	}
 
 	for _, alert := range wafAlert {
+		alert.Alert.Rule.Data = Base64Encode(alert.Alert.Rule.Data)
 		altJson, err := json.Marshal(alert)
 		if err != nil {
 			continue

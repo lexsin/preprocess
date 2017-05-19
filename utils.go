@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/binary"
 	"errors"
 	"io"
@@ -14,6 +15,10 @@ import (
 	"preprocess/modules/mlog"
 	"strings"
 )
+
+func Base64Encode(input string) string {
+	return base64.StdEncoding.EncodeToString([]byte(input))
+}
 
 func CheckSuffix(FileName string, suffixs ...string) bool {
 	suffix := path.Ext(FileName)
