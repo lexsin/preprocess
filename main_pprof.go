@@ -17,12 +17,12 @@ import (
 var WEBPPROF = 0
 
 func main() {
-	if WEBPPROF == 1 {
+	if WEBPPROF == 0 {
+		startPProf()
+	} else {
 		go func() {
 			log.Println(http.ListenAndServe("localhost:6060", nil))
 		}()
-	} else {
-		startPProf()
 	}
 
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
