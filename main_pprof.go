@@ -1,9 +1,10 @@
 package main
 
-/*
 import (
 	"flag"
 	"log"
+	"net/http"
+	//_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"preprocess/modules/mconfig"
@@ -13,9 +14,16 @@ import (
 	//"runtime"
 )
 
+var WEBPPROF = 0
 
 func main() {
-	startPProf()
+	if WEBPPROF == 1 {
+		go func() {
+			log.Println(http.ListenAndServe("localhost:6060", nil))
+		}()
+	} else {
+		startPProf()
+	}
 
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	CreateDir(DpiWatchDir)
@@ -37,7 +45,10 @@ func main() {
 	signal.Notify(c)
 	s := <-c
 	mlog.Info("exit by signal:", s.String())
-	startMempro()
+	if WEBPPROF == 0 {
+		startMempro()
+	}
+
 }
 
 func startPProf() {
@@ -72,4 +83,3 @@ func startMempro() {
 		f.Close()
 	}
 }
-*/
