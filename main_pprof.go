@@ -52,6 +52,7 @@ func main() {
 }
 
 func startPProf() {
+	mlog.Debug("start cpuprofile")
 	var cpuprofile = flag.String("cpuprofile", "", "write cpu profile `file`")
 
 	flag.Parse()
@@ -69,6 +70,7 @@ func startPProf() {
 }
 
 func startMempro() {
+	mlog.Debug("start memprofile")
 	var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 	flag.Parse()
 	if *memprofile != "" {
