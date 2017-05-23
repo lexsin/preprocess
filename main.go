@@ -2,12 +2,9 @@ package main
 
 import (
 	"preprocess/modules/mconfig"
-	//"preprocess/modules/mlog"
 )
 
 func main() {
-	//var block chan int
-
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	CreateDir(DpiWatchDir)
 	go notify_ftp_mv(DpiWatchDir, DpiHandle)
@@ -24,7 +21,5 @@ func main() {
 	//begin waf-alert http server
 	go RunWafServer()
 
-	//block
-	//<-block
 	safeExit()
 }

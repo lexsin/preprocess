@@ -276,9 +276,9 @@ func PerTransToBackendObj(src *xdrParse.DpiXdr) *BackendInfo {
 	obj.Http.StateCode = src.HttpBaseInfo.UsHttpStatus
 	obj.Http.Method = src.HttpBaseInfo.UcHttpMethod
 	obj.Http.Version = src.HttpBaseInfo.Uchttpversion
-	obj.Http.HeadFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0x04))
-	obj.Http.ServFlag = uint8(src.HttpBaseInfo.UcUnionFlag & 0x38)
-	obj.Http.RequestFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0xc0))
+	obj.Http.HeadFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0x20))
+	obj.Http.ServFlag = uint8(src.HttpBaseInfo.UcUnionFlag & 0x1c)
+	obj.Http.RequestFlag = IntToBool(uint32(src.HttpBaseInfo.UcUnionFlag & 0x03))
 	obj.Http.Browser = src.HttpBaseInfo.UcIE
 	obj.Http.Portal = src.HttpBaseInfo.UcPortal
 	obj.Sip.CallingNo = src.SipCaller
@@ -289,9 +289,9 @@ func PerTransToBackendObj(src *xdrParse.DpiXdr) *BackendInfo {
 	obj.Sip.HangupReason = src.Sip.UcHookReason
 	obj.Sip.SignalType = src.Sip.UcSignalType
 	obj.Sip.StreamCount = src.Sip.UsDataflowNum
-	obj.Sip.Malloc = IntToBool(uint32(src.Sip.UbSipIVMR & 0x2000))
-	obj.Sip.Bye = IntToBool(uint32(src.Sip.UbSipIVMR & 0x4000))
-	obj.Sip.Invite = IntToBool(uint32(src.Sip.UbSipIVMR & 0x8000))
+	obj.Sip.Malloc = IntToBool(uint32(src.Sip.UbSipIVMR & 0x03))
+	obj.Sip.Bye = IntToBool(uint32(src.Sip.UbSipIVMR & 0x02))
+	obj.Sip.Invite = IntToBool(uint32(src.Sip.UbSipIVMR & 0x03))
 	obj.Rtsp.Url = src.RtspUrl
 	obj.Rtsp.UserAgent = src.RtspUserAgent
 	obj.Rtsp.ServerIp = src.RtspServerIp

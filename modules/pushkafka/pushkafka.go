@@ -21,11 +21,7 @@ type PushKafkaer interface {
 func PushKafka(info PushKafkaer) error {
 	topic := info.TopicName()
 	writer, ok := WriterMap[topic]
-	/*
-		for k, v := range WriterMap {
-			//mlog.Debug("k=", k, "v=", v)
-		}
-	*/
+
 	if !ok {
 		mlog.Error("topic:", topic, "not exist")
 		return errors.New("topic not exist")
@@ -74,9 +70,22 @@ func CreateTopicWriter(topicName string) error {
 				//mlog.Debug("get topic data:", string(data.data))
 				producer := Broker.Producer(kafka.NewProducerConf())
 				msg := &proto.Message{Value: data.data}
-				if _, err := producer.Produce(topicName, int32(data.partition), msg); err != nil {
-					mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s",
-						topicName, data.partition, err.Error()))
+
+				for i := 0; i < 3; i++ {
+					if _, err := producer.Produce(topicName, int32(data.partition), msg); err == nil {
+						break
+					} else {
+						if err == proto.ErrRequestTimeout {
+							if i == 2 {
+								mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s,(%d)times",
+									topicName, data.partition, err.Error()), 3)
+							}
+							continue
+						}
+						mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s,",
+							topicName, data.partition, err.Error()))
+						break
+					}
 				}
 			case <-time.After(waitTimeOut):
 				mlog.Debug("writer(", topicName, ") wait ", time.Duration(waitTimeOut).Seconds(), "s...")

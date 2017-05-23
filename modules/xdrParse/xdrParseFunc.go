@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	//"preprocess/modules/mlog"
+	"preprocess/modules/mlog"
 )
 
 const (
@@ -166,7 +166,7 @@ func parsHttpBaseInfo(xdr *TlvValue, obj *DpiXdr) error {
 func parsHttpHost(xdr *TlvValue, obj *DpiXdr) error {
 	//11
 	//Debug("xdr.data=", xdr.Data)
-	//Debug("string(xdr.Data)=", string(xdr.Data))
+	//mlog.Debug(fmt.Sprintf("string(xdr.Data)=[%s]", string(xdr.Data)))
 	obj.HttpInfo.HttpHost = string(xdr.Data)
 	return nil
 }
