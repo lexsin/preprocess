@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"log"
-	"net/http"
+	//"net/http"
 	//_ "net/http/pprof"
 	"os"
 	"os/signal"
@@ -14,16 +14,9 @@ import (
 	//"runtime"
 )
 
-var WEBPPROF = 0
-
 func main() {
-	if WEBPPROF == 0 {
-		startPProf()
-	} else {
-		go func() {
-			log.Println(http.ListenAndServe("localhost:6060", nil))
-		}()
-	}
+	startPProf()
+	defer pprof.StopCPUProfile()
 
 	DpiWatchDir, _ := mconfig.Conf.String("dir", "DpiXdrDir")
 	CreateDir(DpiWatchDir)
@@ -45,9 +38,7 @@ func main() {
 	signal.Notify(c)
 	s := <-c
 	mlog.Info("exit by signal:", s.String())
-	if WEBPPROF == 0 {
-		startMempro()
-	}
+	startMempro()
 
 }
 
@@ -64,7 +55,6 @@ func startPProf() {
 		if err := pprof.StartCPUProfile(f); err != nil {
 			log.Fatal("could not start CPU profile: ", err)
 		}
-		defer pprof.StopCPUProfile()
 	}
 
 }
