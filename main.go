@@ -1,6 +1,5 @@
 package main
 
-/*
 import (
 	"preprocess/modules/mconfig"
 )
@@ -24,4 +23,3 @@ func main() {
 
 	safeExit()
 }
-*/
