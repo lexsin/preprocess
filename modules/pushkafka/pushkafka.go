@@ -77,7 +77,7 @@ func CreateTopicWriter(topicName string) error {
 					} else {
 						if err == proto.ErrRequestTimeout {
 							if i == 2 {
-								mlog.Error(fmt.Sprintf("Write topic %s paration %d error:%s,(%d)times",
+								mlog.Warning(fmt.Sprintf("Write topic %s paration %d error:%s,(%d)times",
 									topicName, data.partition, err.Error()), 3)
 							}
 							continue

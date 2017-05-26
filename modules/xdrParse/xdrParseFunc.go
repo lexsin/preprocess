@@ -287,17 +287,19 @@ func parsFtpCurDir(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsFtpTransMode(xdr *TlvValue, obj *DpiXdr) error {
 	//30
-	if err := normalDataDecode(xdr.Data, &obj.FtpInfo.FtpTransMode); err != nil {
-		return errors.New(fmt.Sprintf("XDR_FTP_TRANS_MODE error:%s", err.Error()))
-	}
+	obj.FtpInfo.FtpTransMode = xdr.ShortData
+	//if err := normalDataDecode(xdr.Data, &obj.FtpInfo.FtpTransMode); err != nil {
+	//	return errors.New(fmt.Sprintf("XDR_FTP_TRANS_MODE error:%s", err.Error()))
+	//}
 	return nil
 }
 
 func parsFtpTransType(xdr *TlvValue, obj *DpiXdr) error {
 	//31
-	if err := normalDataDecode(xdr.Data, &obj.FtpInfo.FtpTransType); err != nil {
-		return errors.New(fmt.Sprintf("XDR_FTP_TRANS_TYPE error:%s", err.Error()))
-	}
+	obj.FtpInfo.FtpTransType = xdr.ShortData
+	//if err := normalDataDecode(xdr.Data, &obj.FtpInfo.FtpTransType); err != nil {
+	//	return errors.New(fmt.Sprintf("XDR_FTP_TRANS_TYPE error:%s", err.Error()))
+	//}
 	return nil
 }
 
@@ -387,9 +389,10 @@ func parsMailHdr(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsMailAcsType(xdr *TlvValue, obj *DpiXdr) error {
 	//44
-	if err := normalDataDecode(xdr.Data, &obj.MailInfo.MailAcsType); err != nil {
-		return errors.New(fmt.Sprintf("XDR_MAIL_ACS_TYPE error:%s", err.Error()))
-	}
+	obj.MailInfo.MailAcsType = xdr.ShortData
+	//if err := normalDataDecode(xdr.Data, &obj.MailInfo.MailAcsType); err != nil {
+	//	return errors.New(fmt.Sprintf("XDR_MAIL_ACS_TYPE error:%s", err.Error()))
+	//}
 	return nil
 }
 
@@ -401,9 +404,10 @@ func parsDnsZones(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsDnsIpNum(xdr *TlvValue, obj *DpiXdr) error {
 	//46
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsIpNum); err != nil {
-		return errors.New(fmt.Sprintf("XDR_DNS_IP_NUM error:%s", err.Error()))
-	}
+	obj.DnsInfo.DnsIpNum = xdr.ShortData
+	//if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsIpNum); err != nil {
+	//	return errors.New(fmt.Sprintf("XDR_DNS_IP_NUM error:%s", err.Error()))
+	//}
 	return nil
 }
 
@@ -421,41 +425,52 @@ func parsDnsIpv6(xdr *TlvValue, obj *DpiXdr) error {
 
 func parsDnsRspCode(xdr *TlvValue, obj *DpiXdr) error {
 	//49
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRspCode); err != nil {
-		return errors.New(fmt.Sprintf("XDR_DNS_RSP_CODE error:%s", err.Error()))
-	}
+	obj.DnsInfo.DnsRspCode = xdr.ShortData
+	//if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRspCode); err != nil {
+	//	return errors.New(fmt.Sprintf("XDR_DNS_RSP_CODE error:%s", err.Error()))
+	//}
 	return nil
 }
 
 func parsDnsRsqCnt(xdr *TlvValue, obj *DpiXdr) error {
 	//50
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRsqCnt); err != nil {
-		return errors.New(fmt.Sprintf("XDR_DNS_RSQ_CNT error:%s", err.Error()))
-	}
+	obj.DnsInfo.DnsRsqCnt = xdr.ShortData
+	//if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRsqCnt); err != nil {
+	//	return errors.New(fmt.Sprintf("XDR_DNS_RSQ_CNT error:%s", err.Error()))
+	//}
 	return nil
 }
 
 func parsDnsRspRecordCnt(xdr *TlvValue, obj *DpiXdr) error {
 	//51
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRspRecordCnt); err != nil {
-		return errors.New(fmt.Sprintf("XDR_DNS_RSP_RECODE_CNT error:%s", err.Error()))
-	}
+	obj.DnsInfo.DnsRspRecordCnt = xdr.ShortData
+	/*
+		if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsRspRecordCnt); err != nil {
+			return errors.New(fmt.Sprintf("XDR_DNS_RSP_RECODE_CNT error:%s", err.Error()))
+		}
+	*/
 	return nil
 }
 
 func parsDNSAuthCnttCnt(xdr *TlvValue, obj *DpiXdr) error {
 	//52
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsAuthCnttCnt); err != nil {
-		return errors.New(fmt.Sprintf("XDR_DNS_AUTH_CNTT_CNT error:%s", err.Error()))
-	}
+	obj.DnsInfo.DnsAuthCnttCnt = xdr.ShortData
+	/*
+		if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsAuthCnttCnt); err != nil {
+			return errors.New(fmt.Sprintf("XDR_DNS_AUTH_CNTT_CNT error:%s", err.Error()))
+		}
+	*/
 	return nil
 }
 
 func parsDnsExtraRecordCnt(xdr *TlvValue, obj *DpiXdr) error {
 	//53
-	if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsExtraRecordCnt); err != nil {
-		return errors.New(fmt.Sprintf("XDR_DNS_EXTRA_RECORD_CNT error:%s", err.Error()))
-	}
+	obj.DnsInfo.DnsExtraRecordCnt = xdr.ShortData
+	/*
+		if err := normalDataDecode(xdr.Data, &obj.DnsInfo.DnsExtraRecordCnt); err != nil {
+			return errors.New(fmt.Sprintf("XDR_DNS_EXTRA_RECORD_CNT error:%s", err.Error()))
+		}
+	*/
 	return nil
 }
 
